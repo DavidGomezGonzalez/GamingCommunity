@@ -1,0 +1,5 @@
+Users(nick, password, email, nombre, apellidos, tipo)
+Comentarios(Id_comentario, contenido, nick_users)
+Noticias(Id_noticia, titulo, contenido, Id_comentario, nick_users)
+Tema(Id_tema, titulo, contenido, abierto(boolean), Id_comentario, nick_users)
+Ranking(id_ranking, posicion, nick_users)
