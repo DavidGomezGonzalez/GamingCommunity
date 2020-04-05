@@ -1,4 +1,4 @@
-Users(nick, password, email, nombre, apellidos, tipo)
+Users(nick, password, email, nombre, apellidos, tipo, foto_Avatar)
 Comentarios(Id_comentario, contenido, nick_users)
 Noticias(Id_noticia, titulo, contenido, Id_comentario, nick_users)
 Tema(Id_tema, titulo, contenido, abierto(boolean), Id_comentario, nick_users)
