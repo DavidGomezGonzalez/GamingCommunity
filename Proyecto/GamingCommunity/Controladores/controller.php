@@ -40,11 +40,14 @@ switch ($accion) {
         break;
     case "iniciarSesion":
         $respuesta = iniciarSesionEmail($obj->email, $obj->pass);
-        $_SESSION['user'] = verNick($obj->email);
 
         if ($respuesta == FALSE) {
             $respuesta = iniciarSesionNick($obj->email, $obj->pass);
-            $_SESSION['user'] = $obj->email;
+            if ($respuesta == TRUE) {
+                $_SESSION['user'] = $obj->email;
+            }
+        } else {
+            $_SESSION['user'] = verNick($obj->email);
         }
 
         echo json_encode($respuesta);

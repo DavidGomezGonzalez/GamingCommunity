@@ -9,6 +9,7 @@
 
 include_once '../Modelo/Usuario.php';
 include_once '../Modelo/Password.php';
+include_once '../Modelo/Conexion.php';
 error_reporting(0);
 
 function Registrarse($nick, $nombre, $apellidos, $pass, $email)
