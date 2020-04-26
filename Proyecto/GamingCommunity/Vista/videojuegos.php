@@ -111,6 +111,7 @@ and open the template in the editor.
     <?php
     session_start();
     error_reporting(0);
+    header('Access-Control-Allow-Origin: *');
     $user = "";
     if ($_SESSION['user'] != "") {
         $user = $_SESSION['user'];

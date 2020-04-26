@@ -103,7 +103,7 @@ function iniciarSesionEmail($email, $passwd)
 function verNick($email)
 {
     $conexion = Conexion::conectar();
-    $resultado = $conexion->query("SELECT nick FROM users WHERE email = '$email'");
+    $resultado = $conexion->query("SELECT nick FROM users WHERE email = '" . $email . "'");
 
     if ($resultado) {
         while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
@@ -114,4 +114,119 @@ function verNick($email)
     unset($conexion);
 
     return $nick;
+}
+
+function cambiarFecha($fecha)
+{
+    $fech = explode(" ", $fecha);
+
+    $fe = explode("-", $fech[0]);
+
+    $fechaFinal = "" . $fe[2] . "/" . $fe[1] . "/" . $fe[0] . " " . $fech[1];
+
+    echo $fechaFinal;
+}
+
+
+function visitasForo($id_tema)
+{
+    $vistas = 0;
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM tema WHERE id = " . $id_tema . "");
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $vistas = $row["vistas"];
+            $vistas += 1;
+        }
+    }
+
+    unset($conexion);
+    visitasForoInsertar($id_tema, $vistas);
+}
+
+function visitasForoInsertar($id_tema, $vistas)
+{
+
+    $conexion = Conexion::conectar();
+    $conexion->beginTransaction();
+
+    $insert = $conexion->prepare("UPDATE tema  SET vistas=? WHERE id = ?");
+
+    $insert->bindParam(1, $vistas);
+    $insert->bindParam(2, $id_tema);
+
+    $todobien = $insert->execute();
+
+    if ($todobien == TRUE) {
+        $conexion->commit();
+    } else {
+        $conexion->rollback();
+    }
+
+    unset($conexion);
+}
+
+function respuestasTema($id_tema)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT count(*) FROM comentarios WHERE id_tema = " . $id_tema . "")->fetchColumn();
+
+    echo $resultado;
+
+    unset($conexion);
+}
+
+
+function ultimoComentarioForo($id_tema)
+{
+
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM comentarios WHERE id_tema = " . $id_tema . " ORDER BY fecha_creacion DESC LIMIT 1");
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $nick = $row["nick_user"];
+
+            echo "<a href='#'>";
+            echo $nick;
+            echo "</a></p><p>";
+            echo $row['fecha_creacion'];
+        }
+    }
+
+    if (!$nick) {
+
+        $conexion2 = Conexion::conectar();
+        $resultado2 = $conexion2->query("SELECT * FROM tema WHERE id = " . $id_tema . "");
+        if ($resultado2) {
+            while ($row2 = $resultado2->fetch(PDO::FETCH_ASSOC)) {
+                echo "<a href='#'>";
+                echo $row2["autor_nick"];
+                echo "</a></p><p>";
+                echo $row2['fecha_creacion'];
+            }
+            unset($conexion2);
+        }
+    }
+
+    unset($conexion);
+}
+
+function existe_Avatar($nick)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM users WHERE nick = '" . $nick . "'");
+
+    $foto_Avatar = "";
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $foto_Avatar = $row["foto_Avatar"];
+        }
+    }
+
+    unset($conexion);
+
+    return $foto_Avatar;
 }

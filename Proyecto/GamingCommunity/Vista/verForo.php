@@ -29,12 +29,19 @@ require_once '../modelo/Conexion.php';
 require_once '../Controladores/Funciones.php';
 
 
+
 $conn = Conexion::conectarMysqli();
 
 $limit      = (isset($_GET['limit'])) ? $_GET['limit'] : 10;
 $page       = (isset($_GET['page'])) ? $_GET['page'] : 1;
 $links      = (isset($_GET['links'])) ? $_GET['links'] : 7;
-$query      = "SELECT * FROM tema";
+
+$id      = $_REQUEST['id'];
+visitasForo($id);
+
+$query      = "SELECT * FROM comentarios WHERE id_tema = " . $id . "";
+
+//$query = "SELECT * FROM tema";
 
 $Paginator  = new Paginator($conn, $query);
 
@@ -82,6 +89,10 @@ $results    = $Paginator->getData($limit, $page);
         background-color: white;
 
         margin-bottom: 10px;
+    }
+
+    #foto_user {
+        height: 70px;
     }
 
     #sub_cabecera_right span {
@@ -190,6 +201,31 @@ $results    = $Paginator->getData($limit, $page);
 
     #contenido {
         padding: 1% 5%;
+    }
+
+    #comentario {
+        border: 4px solid #E5E5E5;
+        margin-bottom: 3px;
+    }
+
+    #fecha {
+        background-color: #2386B7;
+        padding: 1%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        color: white;
+    }
+
+    #comentario_contenido {
+        padding: 1%;
+    }
+
+    #foto_Avatar {
+        width: 80px;
+        height: 80px;
+        border: 2px solid black;
+        background-color: white;
     }
 
 
@@ -354,7 +390,25 @@ $results    = $Paginator->getData($limit, $page);
             </div>
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
-                    <img src="../img/usuario.svg" id="foto_user">
+                    <?php
+                    $foto_avatar =  existe_Avatar($user);
+
+                    if ($foto_avatar == "") {
+
+                    ?>
+
+                        <img id="foto_user" src="../img/usuario.svg" alt="avatar">
+
+                    <?php
+
+                    } else {
+                    ?>
+
+                        <img id="foto_user" src="<?php echo "../Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
+
+                    <?php
+                    }
+                    ?>
 
                     <?php
                     echo "<span id='user'>$user</span>";
@@ -393,107 +447,56 @@ $results    = $Paginator->getData($limit, $page);
 
             <div>
 
-                <table class="table table-striped table-condensed table-bordered table-rounded">
-                    <thead>
-                        <tr>
-                            <th width="25%">Titulo / Autor</th>
-                            <th width="20%">Respuestas / Visitas</th>
-                            <th width="20%">Ultimo mensaje por</th>
-                        </tr>
-                    </thead>
+                <?php for ($i = 0; $i < count($results->data); $i++) : ?>
+                    <div id="comentario">
+                        <div id="fecha">
+                            <span>
+                                <?php
 
-                    <tbody><?php for ($i = 0; $i < count($results->data); $i++) : ?>
-                            <tr>
-                                <td>
-                                    <p><?php echo $results->data[$i]['titulo'];
-                                        echo "</p><p>Iniciado por <b>";
-                                        echo $results->data[$i]['autor_nick'];
-                                        echo "</b> , ";
-                                        echo $results->data[$i]['fecha_creacion'];
-                                        ?></p>
-                                </td>
-                                <td><?php echo "<p>Respuestas:";
-                                    respuestasTema($results->data[$i]['id']) ?></p>
-                                    <?php echo "<p>Vistas:";
-                                    echo $results->data[$i]['vistas']; ?></p>
-                                </td>
-                                <td>
-                                    <p><?php
-                                        ultimoComentarioForo($results->data[$i]['id']);
-                                        echo " <a href='verForo.php?id=" . $results->data[$i]['id'] . "'>&#x25b6;</a>";              ?></p>
-                                </td>
-                            </tr>
-                        <?php endfor; ?></tbody>
-                </table>
+                                $fecha = $results->data[$i]['fecha_creacion'];
 
+                                cambiarFecha($fecha);
+
+                                ?>
+                            </span>
+                            <span>
+                                <?php echo "#" . ($i + 1) . ""; ?>
+                            </span>
+                        </div>
+                        <div id="comentario_contenido">
+
+                            <?php
+
+                            $avatar =  existe_Avatar($results->data[$i]['nick_user']);
+
+                            if ($avatar == "") {
+
+                            ?>
+
+                                <p><img id="foto_Avatar" src="../img/usuario.svg" alt="avatar">
+
+                                <?php
+
+                            } else {
+                                ?>
+
+                                    <p><img id="foto_Avatar" src="<?php echo "../Download/fotos_Avatar/" . $avatar; ?>" alt="avatar">
+
+                                    <?php
+                                }
+
+                                echo "<b>" . $results->data[$i]['nick_user'] . "</b></p>";
+                                echo "<p>" . $results->data[$i]['contenido'] . "</p>";
+                                    ?>
+                        </div>
+
+                    </div>
+
+                <?php endfor; ?>
                 <?php echo $Paginator->createLinks($links, 'pagination pagination-sm'); ?>
             </div>
 
-            <div id="opciones">
-                <h3>Opciones de Desplegado de Temas</h3>
-                <div id="sub_opciones">
 
-                    <div>
-                        <span>Mostrar temas desde ...</span>
-                        <select id="mostrar_temas">
-                            <option value="Principio">Principio</option>
-                            <option value="ultimoDia">El Ultimo Día</option>
-                            <option value="ultimoDosDias">Los Ultimos 2 Días</option>
-                        </select>
-                    </div>
-                    <div>
-                        <span>Ordenar temas por:</span>
-                        <select id="orden_temas">
-                            <option value="ultimoMsg">Fecha último mensaje</option>
-                            <option value="inicioDia">Fecha Inicio Tema</option>
-                            <option value="NRespuesta">Nº Respuesta</option>
-                        </select>
-                    </div>
-                    <div>
-                        <span>Plataforma:</span>
-                        <select id="plataforma">
-                            <option value="ultimoMsg">Fecha último mensaje</option>
-                            <option value="inicioDia">Fecha Inicio Tema</option>
-                            <option value="NRespuesta">Nº Respuesta</option>
-                        </select>
-                    </div>
-                    <div>
-                        <span>Videojuego:</span>
-                        <div id="games">
-                            <input type="search">
-                            <button>🔍</button>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div id="leyendas-permisos">
-                    <div id="leyenda">
-                        <h3>Leyenda de Iconos</h3>
-                        <span>Contiene Mensajes sin Leer</span>
-                        <span>No contiene mensajes sin leer</span>
-                        <span>Tema caliente con mensajes no leídos</span>
-                    </div>
-                    <div id="permisos">
-                        <h3>Permisos de Publicación</h3>
-                        <?php
-
-                        if (!$user) {
-                            echo "<span>No puedes crear temas</span>";
-                            echo "<span>No puedes responder temas</span>";
-                            echo "<span>No puedes subir archivos adjuntos</span>";
-                            echo "<span>No puedes editar tus mensajes</span>";
-                        } else {
-                            echo "<span>Puedes crear temas</span>";
-                            echo "<span>Puedes responder temas</span>";
-                            echo "<span>Puedes subir archivos adjuntos</span>";
-                            echo "<span>Puedes editar tus mensajes</span>";
-                        }
-                        ?>
-                    </div>
-
-                </div>
-            </div>
         </div>
 
     </div>
