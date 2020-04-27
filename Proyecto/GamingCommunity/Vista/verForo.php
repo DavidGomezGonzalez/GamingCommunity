@@ -14,7 +14,7 @@ and open the template in the editor.
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" <link rel="stylesheet" href="http://path/to/font-awesome/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+<script src="https://cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>
 <?php
 session_start();
 //error_reporting(0);
@@ -226,6 +226,10 @@ $results    = $Paginator->getData($limit, $page);
         height: 80px;
         border: 2px solid black;
         background-color: white;
+    }
+
+    #div_Respuesta {
+        margin-top: 10px;
     }
 
 
@@ -493,7 +497,26 @@ $results    = $Paginator->getData($limit, $page);
                     </div>
 
                 <?php endfor; ?>
-                <?php echo $Paginator->createLinks($links, 'pagination pagination-sm'); ?>
+                <?php echo $Paginator->createLinks2($links, 'pagination pagination-sm', $id); ?>
+
+                <div id="alert_Error" style="display: none" class="alert alert-danger" role="alert">
+                    ¡Error!
+                </div>
+
+                <button id="bt_Responder" type="button" class="btn btn-primary">Responder</button>
+                <button style="display: none; text-align: right;" id="bt_Cerrar" type="button" class="btn btn-danger">Cerrar</button>
+
+                <div id="div_Respuesta" style="display: none">
+                    <textarea id="editor" name="editor1"></textarea>
+                    <script>
+                        var editor = CKEDITOR.replace('editor1');
+                    </script>
+                </div>
+
+                <button style="display: none" id="bt_Guardar" type="button" class="btn btn-primary">Guardar</button>
+
+
+
             </div>
 
 
@@ -506,6 +529,7 @@ $results    = $Paginator->getData($limit, $page);
     $(document).ready(inicio);
 
     function inicio() {
+
         var user = $("#user").text();
         console.log(user);
         if (user == "") {
@@ -515,6 +539,74 @@ $results    = $Paginator->getData($limit, $page);
             $("#cerrar_sesion").css("display", "none");
             console.log("none");
         }
+
+        $("#bt_Responder").click(function() {
+            $("#div_Respuesta").css("display", "block");
+            $("#bt_Responder").css("display", "none");
+            $("#bt_Cerrar").css("display", "block");
+            $("#bt_Guardar").css("display", "block");
+        });
+
+        $("#bt_Cerrar").click(function() {
+            $("#div_Respuesta").css("display", "none");
+            $("#bt_Responder").css("display", "block");
+            $("#bt_Cerrar").css("display", "none");
+            $("#bt_Guardar").css("display", "none");
+        });
+
+        $("#bt_Guardar").click(function() {
+            var dato = CKEDITOR.instances.editor.getData();
+
+            console.log(datos);
+            
+            var datos = dato.replace(/"/g, "'");
+
+            console.log(datos);
+
+            var d = new Date();
+
+            var month = d.getMonth() + 1;
+            var day = d.getDate();
+            var h = d.getHours();
+            var m = d.getMinutes();
+            var s = d.getSeconds();
+
+            var output = d.getFullYear() + '-' +
+                (month < 10 ? '0' : '') + month + '-' +
+                (day < 10 ? '0' : '') + day + " " +
+                (h < 10 ? '0' : '') + h + ':' +
+                (m < 10 ? '0' : '') + m + ':' +
+                (s < 10 ? '0' : '') + s;
+
+            var objeto = {
+                "contenido": datos,
+                "user": user,
+                "id_tema": <?php echo $id; ?>,
+                "fecha": output
+            };
+
+
+            var parametros = JSON.stringify(objeto);
+            console.log(parametros);
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                console.log(this.readyState + " " + this.status);
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = this.responseText;
+                    console.log(myObj);
+                    if (myObj != "Errornull") {
+                        location.reload();
+                    } else {
+                        $("#alert_Error").css("display", "block");
+                    }
+                }
+            };
+
+            xhr.open("POST", "../Controladores/controller.php", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("accion=guardarComentarioForo&objeto=" + parametros);
+        });
     }
 
     function iniciarSesion() {

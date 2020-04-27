@@ -230,3 +230,26 @@ function existe_Avatar($nick)
 
     return $foto_Avatar;
 }
+
+
+function insetarComentarioForo($contenido, $fecha, $nick, $id_tema)
+{
+    $conexion = Conexion::conectar();
+
+    $insert = $conexion->prepare("INSERT INTO comentarios (contenido, fecha_creacion, nick_user, id_tema) VALUES (?,?,?,?)");
+
+    $insert->bindParam(1, $contenido);
+    $insert->bindParam(2, $fecha);
+    $insert->bindParam(3, $nick);
+    $insert->bindParam(4, $id_tema);
+    $todobien = $insert->execute();
+
+    if ($todobien) {
+        echo "Creado Correctamente";
+    } else {
+        echo "Error";
+    }
+
+    unset($insert);
+    unset($conexion);
+}
