@@ -14,11 +14,11 @@ and open the template in the editor.
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" <link rel="stylesheet" href="http://path/to/font-awesome/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="https://cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/18.0.0/classic/ckeditor.js"></script>
 <?php
 session_start();
 //error_reporting(0);
-if ($_SESSION['user'] != "") {
+if (!empty($_SESSION['user'])) {
     $user = $_SESSION['user'];
 }
 ?>
@@ -230,6 +230,36 @@ $results    = $Paginator->getData($limit, $page);
 
     #div_Respuesta {
         margin-top: 10px;
+    }
+
+    table {
+        border-collapse: collapse;
+    }
+
+    table,
+    th,
+    td {
+        border: 1px solid black;
+    }
+
+    .ck-content {
+        height: 200px !important;
+    }
+
+
+
+    /************* CKEDITOR 5 *****************/
+
+    /* Ocultar Video*/
+    .ck-dropdown:nth-of-type(3) {
+        background-color: red !important;
+        display: none;
+    }
+
+    /* Ocultar Imagen*/
+    .ck-file-dialog-button {
+        background-color: red !important;
+        display: none;
     }
 
 
@@ -451,6 +481,56 @@ $results    = $Paginator->getData($limit, $page);
 
             <div>
 
+                <?php
+
+                $tema = verForo($id);
+
+                ?>
+
+                <div id="comentario">
+                    <div id="fecha">
+                        <span>
+                            <?php
+
+                            $fecha = $tema['fecha'];
+
+                            cambiarFecha($fecha);
+
+                            ?>
+                        </span>
+
+                    </div>
+                    <h4 style="margin-left: 10px;"><?php echo $tema['titulo']; ?></h4>
+                    <div id="comentario_contenido">
+
+                        <?php
+
+                        $avatar =  existe_Avatar($tema['autor']);
+
+                        if ($avatar == "") {
+
+                        ?>
+
+                            <p><img id="foto_Avatar" src="../img/usuario.svg" alt="avatar">
+
+                            <?php
+
+                        } else {
+                            ?>
+
+                                <p><img id="foto_Avatar" src="<?php echo "../Download/fotos_Avatar/" . $avatar; ?>" alt="avatar">
+
+                                <?php
+                            }
+
+                            echo "<b>" . $tema['autor'] . "</b></p>";
+                            echo "" . $tema['contenido'] . "";
+                                ?>
+                    </div>
+
+                </div>
+
+
                 <?php for ($i = 0; $i < count($results->data); $i++) : ?>
                     <div id="comentario">
                         <div id="fecha">
@@ -489,8 +569,10 @@ $results    = $Paginator->getData($limit, $page);
                                     <?php
                                 }
 
+                                $contenido = utf8_encode($results->data[$i]['contenido']);
+
                                 echo "<b>" . $results->data[$i]['nick_user'] . "</b></p>";
-                                echo "<p>" . $results->data[$i]['contenido'] . "</p>";
+                                echo "" . $contenido . "";
                                     ?>
                         </div>
 
@@ -507,13 +589,11 @@ $results    = $Paginator->getData($limit, $page);
                 <button style="display: none; text-align: right;" id="bt_Cerrar" type="button" class="btn btn-danger">Cerrar</button>
 
                 <div id="div_Respuesta" style="display: none">
-                    <textarea id="editor" name="editor1"></textarea>
-                    <script>
-                        var editor = CKEDITOR.replace('editor1');
-                    </script>
+                    <div id="editor"></div>
                 </div>
 
                 <button style="display: none" id="bt_Guardar" type="button" class="btn btn-primary">Guardar</button>
+
 
 
 
@@ -530,6 +610,18 @@ $results    = $Paginator->getData($limit, $page);
 
     function inicio() {
 
+
+        var editor;
+
+        ClassicEditor
+            .create(document.querySelector('#editor'))
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
         var user = $("#user").text();
         console.log(user);
         if (user == "") {
@@ -537,6 +629,7 @@ $results    = $Paginator->getData($limit, $page);
             $("#foto_user").css("cursor", "pointer");
             $("#foto_user").attr("title", "Iniciar Sesión");
             $("#cerrar_sesion").css("display", "none");
+            $("#bt_Responder").css("display", "none");
             console.log("none");
         }
 
@@ -545,6 +638,9 @@ $results    = $Paginator->getData($limit, $page);
             $("#bt_Responder").css("display", "none");
             $("#bt_Cerrar").css("display", "block");
             $("#bt_Guardar").css("display", "block");
+
+
+
         });
 
         $("#bt_Cerrar").click(function() {
@@ -555,11 +651,9 @@ $results    = $Paginator->getData($limit, $page);
         });
 
         $("#bt_Guardar").click(function() {
-            var dato = CKEDITOR.instances.editor.getData();
 
-            console.log(datos);
-            
-            var datos = dato.replace(/"/g, "'");
+
+            var datos = editor.getData();
 
             console.log(datos);
 

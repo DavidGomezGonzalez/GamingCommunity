@@ -105,13 +105,21 @@ and open the template in the editor.
         align-items: center;
         margin-left: 10px;
     }
+
+    #foto_user {
+        height: 70px;
+    }
 </style>
 
 <body>
     <?php
     session_start();
     error_reporting(0);
-    if ($_SESSION['user'] != "") {
+
+    require_once 'modelo/Conexion.php';
+    require_once 'Controladores/Funciones.php';
+
+    if (!empty($_SESSION['user'])) {
         $user = $_SESSION['user'];
     }
     ?>
@@ -124,7 +132,25 @@ and open the template in the editor.
             </div>
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
-                    <img src="img/usuario.svg" id="foto_user">
+                    <?php
+                    $foto_avatar =  existe_Avatar($user);
+
+                    if ($foto_avatar == "") {
+
+                    ?>
+
+                        <img id="foto_user" src="img/usuario.svg" alt="avatar">
+
+                    <?php
+
+                    } else {
+                    ?>
+
+                        <img id="foto_user" src="<?php echo "Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
+
+                    <?php
+                    }
+                    ?>
 
                     <?php
                     echo "<span id='user'>$user</span>";

@@ -12,6 +12,17 @@ and open the template in the editor.
 </head>
 <script src="../JavaScript/jQuery v3.4.1.js" type="text/javascript"></script>
 
+<?php
+session_start();
+//error_reporting(0);
+header('Access-Control-Allow-Origin: *');
+require_once '../modelo/Conexion.php';
+require_once '../Controladores/Funciones.php';
+if (!empty($_SESSION['user'])) {
+    $user = $_SESSION['user'];
+}
+?>
+
 <style>
     * {
         margin: 0;
@@ -105,18 +116,164 @@ and open the template in the editor.
         align-items: center;
         margin-left: 10px;
     }
+
+    #foto_user {
+        height: 70px;
+    }
+
+
+
+    /***************************** MENU Hamburguesa ********************************************/
+
+    .nav {
+        padding: 5px;
+        margin: 0;
+        background-color: #fff;
+        box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.1);
+        width: 100%;
+        height: 70px;
+        z-index: 3;
+        background-color: #2486b7;
+
+        margin-bottom: 20px;
+    }
+
+    .nav ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        overflow: hidden;
+        background-color: #fff;
+        background-color: #2486b7;
+    }
+
+    .nav li a {
+        display: block;
+        padding: 20px 20px;
+        text-decoration: none;
+        color: white;
+        font-family: "Raleway";
+    }
+
+    .activa {
+        background-color: #f4f4f4;
+        color: #0d557a !important;
+    }
+
+    .nav li:hover,
+    .nav .menu-btn:hover {
+        background-color: #0d557a;
+        color: white !important;
+    }
+
+    .nav .menu {
+        clear: both;
+        max-height: 0;
+        transition: max-height 0.2s ease-out;
+    }
+
+    /* menu icon */
+
+    .nav .menu-icon {
+        cursor: pointer;
+        display: inline-block;
+        float: right;
+        padding: 28px 40px;
+        position: relative;
+        user-select: none;
+    }
+
+    .nav .menu-icon .navicon {
+        background: #333;
+        display: block;
+        height: 2px;
+        position: relative;
+        transition: background 0.2s ease-out;
+        width: 18px;
+    }
+
+    .nav .menu-icon .navicon:before,
+    .nav .menu-icon .navicon:after {
+        background: #333;
+        content: "";
+        display: block;
+        height: 100%;
+        position: absolute;
+        transition: all 0.2s ease-out;
+        width: 100%;
+    }
+
+    .nav .menu-icon .navicon:before {
+        top: 5px;
+    }
+
+    .nav .menu-icon .navicon:after {
+        top: -5px;
+    }
+
+    /* menu btn */
+
+    .nav .menu-btn {
+        display: none;
+    }
+
+    .nav .menu-btn:checked~.menu {
+        max-height: 240px;
+    }
+
+    .nav .menu-btn:checked~.menu-icon .navicon {
+        background: transparent;
+    }
+
+    .nav .menu-btn:checked~.menu-icon .navicon:before {
+        transform: rotate(-45deg);
+    }
+
+    .nav .menu-btn:checked~.menu-icon .navicon:after {
+        transform: rotate(45deg);
+    }
+
+    .nav .menu-btn:checked~.menu-icon:not(.steps) .navicon:before,
+    .nav .menu-btn:checked~.menu-icon:not(.steps) .navicon:after {
+        top: 0;
+    }
+
+
+
+    /* 48em = 768px */
+    @media (min-width: 768px) {
+        .nav {
+            display: flex;
+            justify-content: center;
+        }
+
+        .nav li {
+            float: left;
+        }
+
+        .nav li a {
+            padding: 20px 30px;
+        }
+
+        .nav .menu {
+            clear: none;
+            max-height: none;
+        }
+
+        .nav .menu-icon {
+            display: none;
+        }
+
+    }
+
+
+    /***************************   MOVIL    ****************************/
+
+    @media (max-width: 1007px) {}
 </style>
 
 <body>
-    <?php
-    session_start();
-    error_reporting(0);
-    header('Access-Control-Allow-Origin: *');
-    $user = "";
-    if ($_SESSION['user'] != "") {
-        $user = $_SESSION['user'];
-    }
-    ?>
+
     <div id="contenedor">
         <div id="cabecera">
             <div id="logo"></div>
@@ -126,7 +283,25 @@ and open the template in the editor.
             </div>
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
-                    <img src="../img/usuario.svg" id="foto_user">
+                    <?php
+                    $foto_avatar =  existe_Avatar($user);
+
+                    if ($foto_avatar == "") {
+
+                    ?>
+
+                        <img id="foto_user" src="../img/usuario.svg" alt="avatar">
+
+                    <?php
+
+                    } else {
+                    ?>
+
+                        <img id="foto_user" src="<?php echo "../Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
+
+                    <?php
+                    }
+                    ?>
 
                     <?php
                     echo "<span id='user'>$user</span>";
@@ -138,6 +313,27 @@ and open the template in the editor.
                 </div>
             </div>
         </div>
+        <nav class="nav">
+            <input class="menu-btn" type="checkbox" id="menu-btn" />
+            <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+            <ul class="menu">
+                <li>
+                    <a href="../index.php">Inicio</a>
+                </li>
+                <li>
+                    <a href="Foro.php">Foro</a>
+                </li>
+                <li>
+                    <a href="#">Clips TV</a>
+                </li>
+                <li>
+                    <a href="#">Ranking</a>
+                </li>
+                <li>
+                    <a class="activa" href="videojuegos.php">Video Juegos</a>
+                </li>
+            </ul>
+        </nav>
 
         <p><span>Buscar Juego: </span><input type="text" id="game-search"></p>
 

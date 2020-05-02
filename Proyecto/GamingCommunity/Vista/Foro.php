@@ -14,11 +14,13 @@ and open the template in the editor.
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" <link rel="stylesheet" href="http://path/to/font-awesome/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/18.0.0/classic/ckeditor.js"></script>
+
 
 <?php
 session_start();
 //error_reporting(0);
-if ($_SESSION['user'] != "") {
+if (!empty($_SESSION['user'])) {
     $user = $_SESSION['user'];
 }
 ?>
@@ -192,6 +194,38 @@ $results    = $Paginator->getData($limit, $page);
         padding: 1% 5%;
     }
 
+    #foto_user {
+        height: 70px;
+    }
+
+    #bt_Insertar_Tema {
+        float: right;
+        margin-bottom: 10px;
+    }
+
+    textarea {
+        overflow: auto;
+        resize: vertical;
+    }
+
+    .ck-content {
+        height: 200px !important;
+    }
+
+    /************* CKEDITOR 5 *****************/
+
+    /* Ocultar Video*/
+    .ck-dropdown:nth-of-type(3) {
+        background-color: red !important;
+        display: none;
+    }
+
+    /* Ocultar Imagen*/
+    .ck-file-dialog-button {
+        background-color: red !important;
+        display: none;
+    }
+
 
 
     /***************************** MENU Hamburguesa ********************************************/
@@ -354,7 +388,25 @@ $results    = $Paginator->getData($limit, $page);
             </div>
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
-                    <img src="../img/usuario.svg" id="foto_user">
+                    <?php
+                    $foto_avatar =  existe_Avatar($user);
+
+                    if ($foto_avatar == "") {
+
+                    ?>
+
+                        <img id="foto_user" src="../img/usuario.svg" alt="avatar">
+
+                    <?php
+
+                    } else {
+                    ?>
+
+                        <img id="foto_user" src="<?php echo "../Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
+
+                    <?php
+                    }
+                    ?>
 
                     <?php
                     echo "<span id='user'>$user</span>";
@@ -391,6 +443,41 @@ $results    = $Paginator->getData($limit, $page);
 
         <div id="contenido">
 
+            <!-- Large modal -->
+            <button type="button" id="bt_Insertar_Tema" class="btn btn-success" data-toggle="modal" data-target=".bd-example-modal-lg">Crear Tema +</button>
+
+            <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="exampleModalScrollableTitle">Crear Tema</h4>
+
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+
+                        </div>
+                        <div class="modal-body">
+                            <label for="titulo" class="col-form-label">Titulo:</label>
+                            <input required type="text" class="form-control" id="titulo">
+                            <div class="form-group">
+                                <label for="contenido" class="col-form-label">Contenido:</label>
+                                <div id="div_Contenido_Tema">
+                                    <div id="editor2"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div id="alert_Error" style="display: none;  text-align: left;" class="alert alert-danger" role="alert">
+                                ¡Error!
+                            </div>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            <button type="button" id="bt_guardar" class="btn btn-primary">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div>
 
                 <table class="table table-striped table-condensed table-bordered table-rounded">
@@ -405,11 +492,15 @@ $results    = $Paginator->getData($limit, $page);
                     <tbody><?php for ($i = 0; $i < count($results->data); $i++) : ?>
                             <tr>
                                 <td>
-                                    <p><?php echo $results->data[$i]['titulo'];
+                                    <p><?php
+                                        echo " <a href='verForo.php?id=" . $results->data[$i]['id'] . "'>" . utf8_encode($results->data[$i]['titulo']) . "</a>";
                                         echo "</p><p>Iniciado por <b>";
                                         echo $results->data[$i]['autor_nick'];
                                         echo "</b> , ";
-                                        echo $results->data[$i]['fecha_creacion'];
+
+                                        $fecha = $results->data[$i]['fecha_creacion'];
+                                        $fecha = cambiarFecha($fecha);
+                                        echo $fecha;
                                         ?></p>
                                 </td>
                                 <td><?php echo "<p>Respuestas:";
@@ -428,6 +519,8 @@ $results    = $Paginator->getData($limit, $page);
 
                 <?php echo $Paginator->createLinks($links, 'pagination pagination-sm'); ?>
             </div>
+
+
 
             <div id="opciones">
                 <h3>Opciones de Desplegado de Temas</h3>
@@ -503,6 +596,16 @@ $results    = $Paginator->getData($limit, $page);
     $(document).ready(inicio);
 
     function inicio() {
+        var editor;
+
+        ClassicEditor
+            .create(document.querySelector('#editor2'))
+            .then(newEditor => {
+                editor = newEditor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
         var user = $("#user").text();
         console.log(user);
         if (user == "") {
@@ -510,8 +613,72 @@ $results    = $Paginator->getData($limit, $page);
             $("#foto_user").css("cursor", "pointer");
             $("#foto_user").attr("title", "Iniciar Sesión");
             $("#cerrar_sesion").css("display", "none");
+            $("#bt_Insertar_Tema").css("display", "none");
             console.log("none");
         }
+
+        $("#bt_guardar").click(function() {
+
+            var titulo = $("#titulo").val();
+            var contenido = editor.getData();
+
+            console.log(titulo);
+            console.log(contenido);
+
+
+            if (titulo && contenido) {
+
+
+                var d = new Date();
+
+                var month = d.getMonth() + 1;
+                var day = d.getDate();
+                var h = d.getHours();
+                var m = d.getMinutes();
+                var s = d.getSeconds();
+
+                var output = d.getFullYear() + '-' +
+                    (month < 10 ? '0' : '') + month + '-' +
+                    (day < 10 ? '0' : '') + day + " " +
+                    (h < 10 ? '0' : '') + h + ':' +
+                    (m < 10 ? '0' : '') + m + ':' +
+                    (s < 10 ? '0' : '') + s;
+
+                var objeto = {
+                    "titulo": titulo,
+                    "contenido": contenido,
+                    "user": user,
+                    "fecha": output
+                };
+
+
+                var parametros = JSON.stringify(objeto);
+                console.log(parametros);
+
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    console.log(this.readyState + " " + this.status);
+                    if (this.readyState == 4 && this.status == 200) {
+                        var myObj = this.responseText;
+                        console.log(myObj);
+                        if (myObj != "Errornull") {
+                            location.reload();
+                        } else {
+                            $("#alert_Error").css("display", "block");
+                        }
+                    }
+                };
+
+                xhr.open("POST", "../Controladores/controller.php", true);
+                xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                xhr.send("accion=guardarTemaForo&objeto=" + parametros);
+            } else {
+                $("#alert_Error").css("display", "block");
+                $("#alert_Error").text("¡Datos Incompletos!");
+            }
+        });
+
+
     }
 
     function iniciarSesion() {

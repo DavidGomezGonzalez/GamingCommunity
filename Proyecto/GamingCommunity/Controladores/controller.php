@@ -56,6 +56,10 @@ switch ($accion) {
         $respuesta = insetarComentarioForo($obj->contenido, $obj->fecha, $obj->user, $obj->id_tema);
         echo json_encode($respuesta);
         break;
+    case "guardarTemaForo":
+        $respuesta = insetarTemaForo($obj->titulo, $obj->contenido, $obj->user, $obj->fecha);
+        echo json_encode($respuesta);
+        break;
 
     default:
         break;

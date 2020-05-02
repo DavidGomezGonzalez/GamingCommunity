@@ -191,7 +191,10 @@ function ultimoComentarioForo($id_tema)
             echo "<a href='#'>";
             echo $nick;
             echo "</a></p><p>";
-            echo $row['fecha_creacion'];
+
+            $fecha = $row['fecha_creacion'];
+            $fecha = cambiarFecha($fecha);
+            echo $fecha;
         }
     }
 
@@ -252,4 +255,53 @@ function insetarComentarioForo($contenido, $fecha, $nick, $id_tema)
 
     unset($insert);
     unset($conexion);
+}
+
+function insetarTemaForo($titulo, $contenido, $autor, $fecha)
+{
+    $conexion = Conexion::conectar();
+
+    $insert = $conexion->prepare("INSERT INTO tema (titulo, contenido, fecha_creacion, abierto, autor_nick, vistas) VALUES (?,?,?,?,?,?)");
+
+    $abierto = TRUE;
+    $vistas = 0;
+
+    $insert->bindParam(1, $titulo);
+    $insert->bindParam(2, $contenido);
+    $insert->bindParam(3, $fecha);
+    $insert->bindParam(4, $abierto);
+    $insert->bindParam(5, $autor);
+    $insert->bindParam(6, $vistas);
+    $todobien = $insert->execute();
+
+    if ($todobien) {
+        echo "Creado Correctamente";
+    } else {
+        echo "Error";
+    }
+
+    unset($insert);
+    unset($conexion);
+}
+
+
+function verForo($id)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM tema WHERE id = " . $id . "");
+    $tema = array();
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $tema["titulo"] = $row["titulo"];
+            $tema["contenido"] = $row["contenido"];
+            $tema["fecha"] = $row["fecha_creacion"];
+            $tema["abierto"] = $row["abierto"];
+            $tema["autor"] = $row["autor_nick"];
+            $tema["visitas"] = $row["vistas"];
+        }
+    }
+
+    unset($conexion);
+
+    return $tema;
 }
