@@ -466,7 +466,7 @@ $results    = $Paginator->getData($limit, $page);
                     <a class="activa" href="Foro.php">Foro</a>
                 </li>
                 <li>
-                    <a href="#">Clips TV</a>
+                <a class="activa" href="clipsTV.php">Gamming TV</a>
                 </li>
                 <li>
                     <a href="#">Ranking</a>

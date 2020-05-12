@@ -15,6 +15,12 @@ and open the template in the editor.
 
         function inicio() {
             $("#b_iniciarSesion").click(iniciarSesion);
+            
+            $("#pass").on('keypress', function(e) {
+            if (e.which == 13) {
+                $("#b_iniciarSesion").click();
+            }
+        });
         }
 
         function iniciarSesion() {

@@ -25,6 +25,9 @@ require_once '../Controladores/Funciones.php';
 if (!empty($_SESSION['user'])) {
     $user = $_SESSION['user'];
 }
+if (!empty($_REQUEST['game'])) {
+    $game_url = $_REQUEST['game'];
+}
 ?>
 
 <style>
@@ -173,9 +176,11 @@ if (!empty($_SESSION['user'])) {
     #p_search_game {
         margin-top: 50px;
     }
-    
 
-    #game, #game-search, #plataform {
+
+    #game,
+    #game-search,
+    #plataform {
         width: 400px;
     }
 
@@ -381,7 +386,7 @@ if (!empty($_SESSION['user'])) {
                     <a href="Foro.php">Foro</a>
                 </li>
                 <li>
-                    <a href="#">Clips TV</a>
+                    <a href="ClipsTV.php">Gamming TV</a>
                 </li>
                 <li>
                     <a href="#">Ranking</a>
@@ -420,7 +425,7 @@ if (!empty($_SESSION['user'])) {
             </div>
 
 
-            <p id="p_search_game"><span>Juego: </span><input type="text" id="game">
+            <p id="p_search_game"><span>Juego: </span><input value="<?php echo (isset($game_url)) ? $game_url : ''; ?>" type="text" id="game">
                 <button id="bt" class="btn btn-primary">Ver</button>
             </p>
             <p><span>Plataforma: </span>
@@ -446,12 +451,14 @@ if (!empty($_SESSION['user'])) {
                 </select>
             </p>
 
+            <!-- <iframe src="https://www.instant-gaming.com/affgames/igr3644585/350x350" scrolling="no" frameborder="0" style="border: 1px solid #000; border-radius: 5px; overflow:hidden; width:350px; height:350px;" allowTransparency="true"></iframe> -->
+
 
             <img id="carga" src="https://upload.wikimedia.org/wikipedia/commons/b/b1/Loading_icon.gif" />
             <div id="alerta" class="alert alert-danger" role="alert">
                 ¡Sin Resultados!
             </div>
-            <div id="div_game" style="visibility: hidden">
+            <div id="div_game">
                 <h3 id="titulo"></h3>
                 <div id="div_flex">
                     <div id="div_descripcion">
@@ -474,12 +481,19 @@ if (!empty($_SESSION['user'])) {
                         <!-- <button id="bt_Traducir" class="btn btn-primary">Traducir</button> -->
                     </div>
                 </div>
+                <button id="bt_comprar" class="btn btn-primary">Comprar</button>
 
             </div>
 
 
+            <iframe src="https://www.instant-gaming.com/affgames/igr3644585/250x250" scrolling="no" frameborder="0" style="border: 1px solid #ccc; border-radius: 5px; overflow:hidden; width:250px; height:250px; margin-top:20px;" allowTransparency="true"></iframe>
 
         </div>
+
+
+
+
+
     </div>
 
     </div>
@@ -550,7 +564,9 @@ if (!empty($_SESSION['user'])) {
         $("#alerta").hide();
         $("#alerta2").hide();
         $("#div_search_game").hide();
+        $("#div_game").hide();
         var user = $("#user").text();
+        var game_url = $("#game").val();
         console.log(user);
         if (user == "") {
             $("#foto_user").click(iniciarSesion);
@@ -559,6 +575,9 @@ if (!empty($_SESSION['user'])) {
             $("#cerrar_sesion").css("display", "none");
             console.log("none");
         }
+
+
+
 
         $("#bt").click(function() {
             var game = $("#game").val();
@@ -670,7 +689,7 @@ if (!empty($_SESSION['user'])) {
                         }
                     }
 
-                    $("#div_game").css("visibility", "visible");
+                    //$("#div_game").css("visibility", "visible");
                     $("#fecha_publicacion").text(fecha_publicacion);
                     $("#titulo").text(title);
                     $("#developer").text(developer);
@@ -694,6 +713,29 @@ if (!empty($_SESSION['user'])) {
 
         });
 
+        if (game_url != '') {
+            $("#bt").click();
+        }
+
+        $("#bt_comprar").click(function() {
+
+            var game_comprar = $("#game").val();
+            var plataforma_comprar = $("#plataform").val();
+            console.log(game_comprar);
+
+            game_comprar = game_comprar.replace(" ", "+");
+
+            //url = "https://www.amazon.com/s?k=" + game_comprar + "+" + plataforma_comprar + "&i=videogames";
+            url = "https://www.instant-gaming.com/es/busquedas/?q=" + game_comprar;
+            window.open(url, '_blank');
+            return false;
+        });
+
+
+        $("#plataform").change(function() {
+            $("#bt").click();
+        });
+
 
         // $("#bt_Traducir").click(function() {
 
@@ -702,6 +744,17 @@ if (!empty($_SESSION['user'])) {
         //     translate(descripcion);
 
         // });
+
+        $("#game-search").on('keypress', function(e) {
+            if (e.which == 13) {
+                $("#bt_Buscar").click();
+            }
+        });
+        $("#game").on('keypress', function(e) {
+            if (e.which == 13) {
+                $("#bt").click();
+            }
+        });
 
 
 
@@ -780,8 +833,8 @@ if (!empty($_SESSION['user'])) {
 
                 $("#carga").hide();
                 $("#div_game").show();
-                $("#alerta").show();
                 $("#alerta").text("¡Error al Traducir!");
+                $("#alerta").show();
 
             });
 

@@ -161,8 +161,8 @@ and open the template in the editor.
                     <a title="Cerrar Sesión" href="Controladores/cerrar_sesion.php" id="cerrar_sesion"><img src="img/puerta_2.svg"></a>
                 </div>
             </div>
+            
         </div>
-
 </body>
 </div>
 
