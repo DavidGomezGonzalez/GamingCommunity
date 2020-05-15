@@ -1,0 +1,13 @@
+
+Client ID
+132036441250-rtmolq0cq03ff18l5r27vnv052ccf4tq.apps.googleusercontent.com
+Client Secret
+7D1yv7W30KQV1RCvRBlnpNOp
+
+
+CALENDAR ->
+
+Client ID
+123000252162-456e0cvqn107jm1j758ds0dkmp9jk8j6.apps.googleusercontent.com
+Client Secret
+o7X6EQyJ7bXLBLbufKGcbRdo

@@ -16,6 +16,9 @@ and open the template in the editor.
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://cdn.ckeditor.com/ckeditor5/18.0.0/classic/ckeditor.js"></script>
 
+<link rel="stylesheet" href="../css/menu.css">
+
+
 
 <?php
 session_start();
@@ -43,98 +46,6 @@ $Paginator  = new Paginator($conn, $query);
 $results    = $Paginator->getData($limit, $page);
 ?>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    #contenedor {
-        width: 100%;
-    }
-
-    #cabecera {
-        width: 100%;
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: nowrap;
-        background-color: black;
-    }
-
-    #sub_cabecera {
-        display: inline-flex;
-        align-items: center;
-        flex-wrap: nowrap;
-    }
-
-    #sub_cabecera_right {
-        background-color: transparent;
-        padding: 5px 10px;
-
-        display: inline-flex;
-        text-align: center;
-        justify-content: flex-end;
-    }
-
-    #sub_cabecera_right img {
-        width: 70px;
-        border: 1px solid black;
-        border-radius: 50%;
-        background-color: white;
-
-        margin-bottom: 10px;
-    }
-
-    #sub_cabecera_right span {
-        color: white;
-        width: auto;
-    }
-
-    #sub_cabecera input {
-        padding: 5px;
-        height: 30px;
-        border-radius: 10px;
-        border: 2px solid white;
-    }
-
-    #sub_cabecera button {
-        font-size: 2rem;
-        border: none;
-        background-color: transparent;
-    }
-
-    #logo {
-        background-image: url("../img/logo.svg");
-        display: flex;
-        width: 95vh;
-        height: 19vh;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
-
-    #cerrar_sesion {
-        width: auto;
-    }
-
-    #cerrar_sesion img {
-        width: 27px;
-    }
-
-
-    #sub_cabecera_right_left {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-
-    #sub_cabecera_right_right {
-        display: flex;
-        align-items: center;
-        margin-left: 10px;
-    }
 
     .disabled a {
         cursor: no-drop;
@@ -190,14 +101,6 @@ $results    = $Paginator->getData($limit, $page);
 
     }
 
-    #contenido {
-        padding: 1% 5%;
-    }
-
-    #foto_user {
-        height: 70px;
-    }
-
     #bt_Insertar_Tema {
         float: right;
         margin-bottom: 10px;
@@ -208,11 +111,11 @@ $results    = $Paginator->getData($limit, $page);
         resize: vertical;
     }
 
+
+    /************* CKEDITOR 5 *****************/
     .ck-content {
         height: 200px !important;
     }
-
-    /************* CKEDITOR 5 *****************/
 
     /* Ocultar Video*/
     .ck-dropdown:nth-of-type(3) {
@@ -227,149 +130,6 @@ $results    = $Paginator->getData($limit, $page);
     }
 
 
-
-    /***************************** MENU Hamburguesa ********************************************/
-
-    .nav {
-        padding: 5px;
-        margin: 0;
-        background-color: #fff;
-        box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.1);
-        width: 100%;
-        height: 70px;
-        z-index: 3;
-        background-color: #2486b7;
-
-        margin-bottom: 20px;
-    }
-
-    .nav ul {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        overflow: hidden;
-        background-color: #fff;
-        background-color: #2486b7;
-    }
-
-    .nav li a {
-        display: block;
-        padding: 20px 20px;
-        text-decoration: none;
-        color: white;
-        font-family: "Raleway";
-    }
-
-    .activa {
-        background-color: #f4f4f4;
-        color: #0d557a !important;
-    }
-
-    .nav li:hover,
-    .nav .menu-btn:hover {
-        background-color: #0d557a;
-        color: white !important;
-    }
-
-    .nav .menu {
-        clear: both;
-        max-height: 0;
-        transition: max-height 0.2s ease-out;
-    }
-
-    /* menu icon */
-
-    .nav .menu-icon {
-        cursor: pointer;
-        display: inline-block;
-        float: right;
-        padding: 28px 40px;
-        position: relative;
-        user-select: none;
-    }
-
-    .nav .menu-icon .navicon {
-        background: #333;
-        display: block;
-        height: 2px;
-        position: relative;
-        transition: background 0.2s ease-out;
-        width: 18px;
-    }
-
-    .nav .menu-icon .navicon:before,
-    .nav .menu-icon .navicon:after {
-        background: #333;
-        content: "";
-        display: block;
-        height: 100%;
-        position: absolute;
-        transition: all 0.2s ease-out;
-        width: 100%;
-    }
-
-    .nav .menu-icon .navicon:before {
-        top: 5px;
-    }
-
-    .nav .menu-icon .navicon:after {
-        top: -5px;
-    }
-
-    /* menu btn */
-
-    .nav .menu-btn {
-        display: none;
-    }
-
-    .nav .menu-btn:checked~.menu {
-        max-height: 240px;
-    }
-
-    .nav .menu-btn:checked~.menu-icon .navicon {
-        background: transparent;
-    }
-
-    .nav .menu-btn:checked~.menu-icon .navicon:before {
-        transform: rotate(-45deg);
-    }
-
-    .nav .menu-btn:checked~.menu-icon .navicon:after {
-        transform: rotate(45deg);
-    }
-
-    .nav .menu-btn:checked~.menu-icon:not(.steps) .navicon:before,
-    .nav .menu-btn:checked~.menu-icon:not(.steps) .navicon:after {
-        top: 0;
-    }
-
-
-
-    /* 48em = 768px */
-    @media (min-width: 768px) {
-        .nav {
-            display: flex;
-            justify-content: center;
-        }
-
-        .nav li {
-            float: left;
-        }
-
-        .nav li a {
-            padding: 20px 30px;
-        }
-
-        .nav .menu {
-            clear: none;
-            max-height: none;
-        }
-
-        .nav .menu-icon {
-            display: none;
-        }
-
-    }
 
 
     /***************************   MOVIL    ****************************/
@@ -389,22 +149,34 @@ $results    = $Paginator->getData($limit, $page);
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
                     <?php
-                    $foto_avatar =  existe_Avatar($user);
 
-                    if ($foto_avatar == "") {
+                    if (isset($_SESSION['foto_avatar'])) {
 
                     ?>
 
-                        <img id="foto_user" src="../img/usuario.svg" alt="avatar">
+                        <img id="foto_user" src="<?php echo $_SESSION['foto_avatar']; ?>" alt="avatar">
 
-                    <?php
+                        <?php
 
                     } else {
-                    ?>
 
-                        <img id="foto_user" src="<?php echo "../Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
+                        $foto_avatar =  existe_Avatar($user);
+
+                        if ($foto_avatar == "") {
+
+                        ?>
+
+                            <img id="foto_user" src="../img/usuario.svg" alt="avatar">
+
+                        <?php
+
+                        } else {
+                        ?>
+
+                            <img id="foto_user" src="<?php echo "../Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
 
                     <?php
+                        }
                     }
                     ?>
 
@@ -430,7 +202,7 @@ $results    = $Paginator->getData($limit, $page);
                     <a class="activa" href="Foro.php">Foro</a>
                 </li>
                 <li>
-                    <a href="ClipsTV.php">Clips TV</a>
+                    <a href="ClipsTV.php">Gaming TV</a>
                 </li>
                 <li>
                     <a href="#">Ranking</a>
@@ -495,7 +267,7 @@ $results    = $Paginator->getData($limit, $page);
                                     <p><?php
                                         echo " <a href='verForo.php?id=" . $results->data[$i]['id'] . "'>" . utf8_encode($results->data[$i]['titulo']) . "</a>";
                                         echo "</p><p>Iniciado por <b>";
-                                        echo $results->data[$i]['autor_nick'];
+                                        echo utf8_encode($results->data[$i]['autor_nick']);
                                         echo "</b> , ";
 
                                         $fecha = $results->data[$i]['fecha_creacion'];
@@ -615,6 +387,8 @@ $results    = $Paginator->getData($limit, $page);
             $("#cerrar_sesion").css("display", "none");
             $("#bt_Insertar_Tema").css("display", "none");
             console.log("none");
+        }else {
+            $("#foto_user").click(verPerfil);
         }
 
         $("#bt_guardar").click(function() {
@@ -683,6 +457,10 @@ $results    = $Paginator->getData($limit, $page);
 
     function iniciarSesion() {
         window.location = "login.php";
+    }
+
+    function verPerfil() {
+        window.location = "Perfil.php";
     }
 </script>
 

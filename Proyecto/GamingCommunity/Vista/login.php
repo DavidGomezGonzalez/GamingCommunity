@@ -10,17 +10,19 @@ and open the template in the editor.
     <meta charset="UTF-8">
     <title></title>
     <script src="../JavaScript/jQuery v3.4.1.js" type="text/javascript"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="132036441250-rtmolq0cq03ff18l5r27vnv052ccf4tq.apps.googleusercontent.com">
     <script>
         $(document).ready(inicio);
 
         function inicio() {
             $("#b_iniciarSesion").click(iniciarSesion);
-            
+
             $("#pass").on('keypress', function(e) {
-            if (e.which == 13) {
-                $("#b_iniciarSesion").click();
-            }
-        });
+                if (e.which == 13) {
+                    $("#b_iniciarSesion").click();
+                }
+            });
         }
 
         function iniciarSesion() {
@@ -83,6 +85,43 @@ and open the template in the editor.
             h1.parentNode.insertBefore(p, h1.nextSibling);
 
         }
+
+        function onSignIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            // console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+            // console.log('Name: ' + profile.getName());
+            // console.log('Image URL: ' + profile.getImageUrl());
+            // console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+
+            insertar_BD_Google(profile);
+        }
+
+        function insertar_BD_Google(profile) {
+            var name = profile.getName();
+
+            name = name.replace(/ /g, "");
+
+            var objeto = {
+                "name": name,
+                "image": profile.getImageUrl()
+            };
+
+            var parametros = JSON.stringify(objeto);
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                console.log(this.readyState + " " + this.status);
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = this.responseText;
+                    console.log(myObj);
+                    irIndex();
+                }
+            };
+
+            xhr.open("POST", "../Controladores/controller.php", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("accion=iniciarSesionGoogle&objeto=" + parametros);
+        }
     </script>
     <style>
         * {
@@ -122,7 +161,7 @@ and open the template in the editor.
             margin-top: 20px;
         }
 
-        #datosIncorrectos{
+        #datosIncorrectos {
 
             padding: 10px;
             border: 2px solid red;
@@ -132,32 +171,46 @@ and open the template in the editor.
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
-
-
         }
 
+        .g-signin2 {
+            margin-top: 10px;
+        }
 
+        #form_IniciarSesion {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 
 <body>
 
-    <h1 id="h1">Iniciar Sesion en GamingCommunity</h1>
-
-    <p>Email o Nick:</p>
-    <p><input type="text" id="email" name="email" placeholder="ejemplo@gaming.com"></p>
-    <p>Contraseña:</p>
-    <p><input type="password" id="pass" name="passwd" placeholder="********"></p>
-    <p><input type="submit" id="b_iniciarSesion" value="Iniciar sesión"></p>
-
-    <form action="registrarse.php" method="post">
-        <p><input type="submit" value="Registrarse"></p>
-    </form>
-
-    <?php
+    <div id="form_IniciarSesion">
 
 
-    ?>
+        <h1 id="h1">Iniciar Sesion en GamingCommunity</h1>
+
+        <p>Email o Nick:</p>
+        <p><input type="text" id="email" name="email" placeholder="ejemplo@gaming.com"></p>
+        <p>Contraseña:</p>
+        <p><input type="password" id="pass" name="passwd" placeholder="********"></p>
+        <p><input type="submit" id="b_iniciarSesion" value="Iniciar sesión"></p>
+
+        <form action="registrarse.php" method="post">
+            <p><input type="submit" value="Registrarse"></p>
+        </form>
+
+
+        <!-- Boton Inicio Google -->
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+    </div>
+
+
+
+
 </body>
 
 </html>

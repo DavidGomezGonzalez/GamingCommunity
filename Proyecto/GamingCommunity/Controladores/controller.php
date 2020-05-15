@@ -52,6 +52,13 @@ switch ($accion) {
 
         echo json_encode($respuesta);
         break;
+    case "iniciarSesionGoogle":
+
+        $_SESSION['user'] = $obj->name;
+        $_SESSION['foto_avatar'] = $obj->image;
+
+        echo json_encode("Logged");
+        break;
     case "guardarComentarioForo":
         $respuesta = insetarComentarioForo($obj->contenido, $obj->fecha, $obj->user, $obj->id_tema);
         echo json_encode($respuesta);

@@ -12,117 +12,269 @@ and open the template in the editor.
 </head>
 <script src="JavaScript/jQuery v3.4.1.js" type="text/javascript"></script>
 
+<link rel="stylesheet" href="css/menu.css">
+
+<?php
+session_start();
+error_reporting(0);
+//header('Access-Control-Allow-Origin: *');
+require_once 'modelo/Conexion.php';
+require_once 'Controladores/FuncionesNoticias.php';
+
+if (!empty($_SESSION['user'])) {
+    $user = $_SESSION['user'];
+}
+
+?>
+
 <style>
-    * {
-        margin: 0;
-        padding: 0;
+    .nav {
+        margin: 0 !important;
+    }
+
+
+    /*************************** CAROUSEL *******************************/
+
+    .carrusel {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr;
+        grid-template-areas: "Carrusel";
+        z-index: 1;
         box-sizing: border-box;
     }
 
-    #contenedor {
+
+    @keyframes slidy {
+        0% {
+            left: 0%;
+        }
+
+        20% {
+            left: 0%;
+        }
+
+        25% {
+            left: -100%;
+        }
+
+        45% {
+            left: -100%;
+        }
+
+        50% {
+            left: -200%;
+        }
+
+        70% {
+            left: -200%;
+        }
+
+        75% {
+            left: -300%;
+        }
+
+        95% {
+            left: -300%;
+        }
+
+        100% {
+            left: -400%;
+        }
+    }
+
+    figure {
+        margin: 0;
+        background: #101010;
+        font-family: Istok Web, sans-serif;
+        font-weight: 100;
+    }
+
+    .carrusel #captioned-gallery {
+        grid-area: "Carrusel";
         width: 100%;
+        overflow: hidden;
     }
 
-    #cabecera {
+    figure.slider {
+        position: relative;
+        width: 500%;
+        font-size: 0;
+        animation: 30s slidy infinite;
+    }
+
+    figure.slider figure {
+        width: 20%;
+        height: auto;
+        display: inline-block;
+        position: inherit;
+    }
+
+    figure.slider img {
         width: 100%;
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: nowrap;
-        background-color: black;
+        height: 350px;
     }
 
-    #sub_cabecera {
-        display: inline-flex;
-        align-items: center;
-        flex-wrap: nowrap;
+    figure.slider figure figcaption {
+        position: absolute;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.4);
+        color: #fff;
+        width: 100%;
+        font-size: 1.5rem;
+        padding: .6rem;
     }
 
-    #sub_cabecera_right {
-        background-color: transparent;
-        padding: 5px 10px;
 
-        display: inline-flex;
-        text-align: center;
-        justify-content: flex-end;
+    /************************ Noticias ******************************* */
+
+    #noticia1 {
+        grid-area: noticia1;
     }
 
-    #sub_cabecera_right img {
-        width: 70px;
-        border: 1px solid black;
-        border-radius: 50%;
+    #noticia2 {
+        grid-area: noticia2;
+    }
+
+    #noticia3 {
+        grid-area: noticia3;
+    }
+
+    #noticia4 {
+        grid-area: noticia4;
+    }
+
+    #noticia5 {
+        grid-area: noticia5;
+    }
+
+    #noticia6 {
+        grid-area: noticia6;
+    }
+
+    #noticia1,
+    #noticia2,
+    #noticia3,
+    #noticia4,
+    #noticia5,
+    #noticia6 {
+        padding: 10px 10%;
+        display: grid;
+        width: 100%;
+        height: 400px;
+        grid-template-rows: 100%;
+    }
+
+
+    .contenido-noticia {
+        display: grid;
+        width: 100%;
+        height: 100%;
+        grid-template-columns: 1fr;
+        /* 40% fondo 60% noticia*/
+        grid-template-rows: 40% 60%;
+        outline: 3px solid #c32231;
         background-color: white;
-
-        margin-bottom: 10px;
     }
 
-    #sub_cabecera_right span {
-        color: white;
-        width: auto;
+    .contenido-noticia:hover{
+        cursor: pointer;
     }
 
-    #sub_cabecera input {
-        padding: 5px;
-        height: 30px;
-        border-radius: 10px;
-        border: 2px solid white;
+
+
+    .noticia-p {
+        display: grid;
+        padding: 10px;
+        overflow: hidden;
+        /* Para Desbordamiento del <p>*/
     }
 
-    #sub_cabecera button {
-        font-size: 2rem;
-        border: none;
-        background-color: transparent;
+    .noticia-p p {
+        /*Interlineado*/
+        line-height: 1.5rem;
+        margin: 5px;
     }
 
-    #logo {
-        background-image: url("img/logo.svg");
-        display: flex;
-        width: 95vh;
-        height: 19vh;
+    .noticia-img {
+        background-size: cover;
         background-repeat: no-repeat;
         background-position: center;
     }
 
+    /* HOVER*/
 
-    #cerrar_sesion {
-        width: auto;
+    .noticia-img:hover {
+        opacity: 0.8;
     }
 
-    #cerrar_sesion img {
-        width: 27px;
+    .noticia-p:hover {
+        background-color: #d8d8d836;
     }
 
+    /********************** Contenido Principal *************************/
+    #contenido {
+        width: 100%;
+        display: grid;
+        grid-row-gap: 20px;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-areas:
+            "noticia1 noticia2"
+            "noticia3 noticia4"
+            "noticia5 noticia6";
+        text-align: justify;
+        padding-top: 5%;
+        background-image: url(img/seamless-pattern-of-abstract-black-hexagon-background-with-red-line-vector.jpg);
 
-    #sub_cabecera_right_left {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
     }
 
+    @media (max-width: 1007px) {
 
-    #sub_cabecera_right_right {
-        display: flex;
-        align-items: center;
-        margin-left: 10px;
-    }
+        #contenido {
+            margin-top: 20px;
+            width: 100%;
+            display: grid;
+            grid-row-gap: 20px;
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "noticia1"
+                "noticia2"
+                "noticia3"
+                "noticia4"
+                "noticia5"
+                "noticia6";
+        }
 
-    #foto_user {
-        height: 70px;
+        #noticia1,
+        #noticia2,
+        #noticia3,
+        #noticia4,
+        #noticia5,
+        #noticia6 {
+            padding: 10px 10%;
+            display: grid;
+            width: 100%;
+            height: 350px;
+            /*Tamaño desde Móvil*/
+            grid-template-rows: 100%;
+        }
+
+        .carrusel {
+            z-index: 1;
+        }
+
+        figure.slider img {
+            width: 100%;
+            height: 200px;
+            /*Tamaño desde Móvil*/
+        }
+
     }
 </style>
 
 <body>
-    <?php
-    session_start();
-    error_reporting(0);
 
-    require_once 'modelo/Conexion.php';
-    require_once 'Controladores/Funciones.php';
-
-    if (!empty($_SESSION['user'])) {
-        $user = $_SESSION['user'];
-    }
-    ?>
     <div id="contenedor">
         <div id="cabecera">
             <div id="logo"></div>
@@ -133,22 +285,34 @@ and open the template in the editor.
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
                     <?php
-                    $foto_avatar =  existe_Avatar($user);
 
-                    if ($foto_avatar == "") {
+                    if (isset($_SESSION['foto_avatar'])) {
 
                     ?>
 
-                        <img id="foto_user" src="img/usuario.svg" alt="avatar">
+                        <img id="foto_user" src="<?php echo $_SESSION['foto_avatar']; ?>" alt="avatar">
 
-                    <?php
+                        <?php
 
                     } else {
-                    ?>
 
-                        <img id="foto_user" src="<?php echo "Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
+                        $foto_avatar =  existe_Avatar($user);
+
+                        if ($foto_avatar == "") {
+
+                        ?>
+
+                            <img id="foto_user" src="img/usuario.svg" alt="avatar">
+
+                        <?php
+
+                        } else {
+                        ?>
+
+                            <img id="foto_user" src="<?php echo "Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
 
                     <?php
+                        }
                     }
                     ?>
 
@@ -161,7 +325,38 @@ and open the template in the editor.
                     <a title="Cerrar Sesión" href="Controladores/cerrar_sesion.php" id="cerrar_sesion"><img src="img/puerta_2.svg"></a>
                 </div>
             </div>
-            
+        </div>
+
+        <nav class="nav">
+            <input class="menu-btn" type="checkbox" id="menu-btn" />
+            <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+            <ul class="menu">
+                <li>
+                    <a class="activa" href="index.php">Inicio</a>
+                </li>
+                <li>
+                    <a href="Vista/Foro.php">Foro</a>
+                </li>
+                <li>
+                    <a href="Vista/clipsTV.php">Gaming TV</a>
+                </li>
+                <li>
+                    <a href="#">Ranking</a>
+                </li>
+                <li>
+                    <a href="Vista/videojuegos.php">Video Juegos</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="carrusel">
+            <div id="captioned-gallery">
+                <figure class="slider">
+
+                </figure>
+            </div>
+        </div>
+        <div id="contenido">
+
         </div>
 </body>
 </div>
@@ -169,20 +364,123 @@ and open the template in the editor.
 <script>
     $(document).ready(inicio);
 
+    function ver_noticia() {
+
+        $(".contenido-noticia").click(function() {
+
+            //console.log(this);
+
+            var id = $(this).attr('id');
+
+            console.log(id);
+
+            window.location = "./Vista/verNoticia.php?id=" + id;
+
+        });
+
+    }
+
+    function carrusel() {
+        $.ajax({
+                data: {
+                    "accion": "carrusel"
+                },
+                type: "POST",
+                dataType: "json",
+                url: "Controladores/controllerNoticias.php",
+            })
+            .done(function(data, textStatus, jqXHR) {
+
+                //console.log(data);
+                data = data.reverse();
+
+                for (var i = 0; i < data.length; i++) {
+                    $(".slider").append("<a>");
+                    $(".slider a").eq(i).attr("href", "Vista/verNoticia.php?id=" + data[i].id);
+                    $(".slider a").eq(i).append("<figure>");
+                    $(".slider a figure").eq(i).append("<img>");
+                    $(".slider a figure img").eq(i).attr("src", data[i].img);
+
+                    $(".slider a figure").eq(i).append("<figcaption>");
+                    $(".slider a figure figcaption").eq(i).text(data[i].titulo);
+
+                }
+
+
+
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                if (console && console.log) {
+                    console.log("La solicitud a fallado: " + textStatus);
+                }
+            });
+    }
+
+
+    function noticias() {
+        $.ajax({
+                data: {
+                    "accion": "noticias"
+                },
+                type: "POST",
+                dataType: "json",
+                url: "Controladores/controllerNoticias.php",
+            })
+            .done(function(data, textStatus, jqXHR) {
+
+                console.log(data);
+
+                for (var i = 0; i < data.length; i++) {
+
+                    $("#contenido").append("<div class='noticia_id'>");
+                    $("#contenido .noticia_id").eq(i).attr("id", "noticia" + (i + 1));
+                    $("#contenido .noticia_id").eq(i).append("<div class='contenido-noticia'>");
+                    $("#contenido .noticia_id .contenido-noticia").eq(i).attr("id", data[i].id);
+                    $("#contenido .noticia_id .contenido-noticia").eq(i).append("<div class='noticia-img'>");
+                    $("#contenido .noticia_id .contenido-noticia .noticia-img").eq(i).css("background-image", "url(" + data[i].img + ")");
+                    $("#contenido .noticia_id .contenido-noticia").eq(i).append("<div class='noticia-p'>");
+                    $("#contenido .noticia_id .contenido-noticia .noticia-p").eq(i).append("<h3>");
+                    $("#contenido .noticia_id .contenido-noticia .noticia-p h3").eq(i).text(data[i].titulo);
+                    $("#contenido .noticia_id .contenido-noticia .noticia-p").eq(i).append("<p>");
+                    $("#contenido .noticia_id .contenido-noticia .noticia-p p").eq(i).text(data[i].subtitulo);
+
+                }
+
+                ver_noticia();
+
+            })
+            .fail(function(jqXHR, textStatus, errorThrown) {
+                if (console && console.log) {
+                    console.log("La solicitud a fallado: " + textStatus);
+                }
+            });
+    }
+
     function inicio() {
         var user = $("#user").text();
         console.log(user);
         if (user == "") {
             $("#foto_user").click(iniciarSesion);
-            $("#foto_user").css("cursor", "pointer");
             $("#foto_user").attr("title", "Iniciar Sesión");
             $("#cerrar_sesion").css("display", "none");
             console.log("none");
+        } else {
+            $("#foto_user").click(verPerfil);
         }
+
+        carrusel();
+        noticias();
+
+
+
     }
 
     function iniciarSesion() {
         window.location = "./Vista/login.php";
+    }
+
+    function verPerfil() {
+        window.location = "./Vista/Perfil.php";
     }
 </script>
 

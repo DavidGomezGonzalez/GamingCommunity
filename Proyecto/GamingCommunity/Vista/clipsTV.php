@@ -14,6 +14,7 @@ and open the template in the editor.
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" <link rel="stylesheet" href="http://path/to/font-awesome/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="../css/menu.css">
 
 
 <?php
@@ -27,107 +28,6 @@ if (!empty($_SESSION['user'])) {
 ?>
 
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    #contenedor {
-        width: 100%;
-    }
-
-    #cabecera {
-        width: 100%;
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: nowrap;
-        background-color: black;
-    }
-
-    #sub_cabecera {
-        display: inline-flex;
-        align-items: center;
-        flex-wrap: nowrap;
-    }
-
-    #sub_cabecera_right {
-        background-color: transparent;
-        padding: 5px 10px;
-
-        display: inline-flex;
-        text-align: center;
-        justify-content: flex-end;
-    }
-
-    #sub_cabecera_right img {
-        width: 70px;
-        border: 1px solid black;
-        border-radius: 50%;
-        background-color: white;
-
-        margin-bottom: 10px;
-    }
-
-    #sub_cabecera_right span {
-        color: white;
-        width: auto;
-    }
-
-    #sub_cabecera input {
-        padding: 5px;
-        height: 30px;
-        border-radius: 10px;
-        border: 2px solid white;
-    }
-
-    #sub_cabecera button {
-        font-size: 2rem;
-        border: none;
-        background-color: transparent;
-    }
-
-    #logo {
-        background-image: url("../img/logo.svg");
-        display: flex;
-        width: 95vh;
-        height: 19vh;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
-
-    #cerrar_sesion {
-        width: auto;
-    }
-
-    #cerrar_sesion img {
-        width: 27px;
-    }
-
-
-    #sub_cabecera_right_left {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-
-    #sub_cabecera_right_right {
-        display: flex;
-        align-items: center;
-        margin-left: 10px;
-    }
-
-    #foto_user {
-        height: 70px;
-    }
-
-    #contenido {
-        padding: 1% 5%;
-    }
-
     /*************** ClipsTV *******************/
 
 
@@ -139,6 +39,8 @@ if (!empty($_SESSION['user'])) {
         overflow-x: auto;
         border: 2px solid black;
         visibility: hidden;
+        border-radius: 50px;
+        background-color: white;
 
 
     }
@@ -150,7 +52,6 @@ if (!empty($_SESSION['user'])) {
         width: 50%;
         padding: 0 3%;
         height: 100%;
-
     }
 
 
@@ -206,151 +107,11 @@ if (!empty($_SESSION['user'])) {
         align-items: center;
     }
 
-
-    /***************************** MENU Hamburguesa ********************************************/
-
-    .nav {
-        padding: 5px;
-        margin: 0;
-        background-color: #fff;
-        box-shadow: 1px 1px 4px 0 rgba(0, 0, 0, 0.1);
-        width: 100%;
-        height: 70px;
-        z-index: 3;
-        background-color: #2486b7;
-
-        margin-bottom: 20px;
-    }
-
-    .nav ul {
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        overflow: hidden;
-        background-color: #fff;
-        background-color: #2486b7;
-    }
-
-    .nav li a {
-        display: block;
-        padding: 20px 20px;
-        text-decoration: none;
-        color: white;
-        font-family: "Raleway";
-    }
-
-    .activa {
-        background-color: #f4f4f4;
-        color: #0d557a !important;
-    }
-
-    .nav li:hover,
-    .nav .menu-btn:hover {
-        background-color: #0d557a;
-        color: white !important;
-    }
-
-    .nav .menu {
-        clear: both;
-        max-height: 0;
-        transition: max-height 0.2s ease-out;
-    }
-
-    /* menu icon */
-
-    .nav .menu-icon {
-        cursor: pointer;
-        display: inline-block;
-        float: right;
-        padding: 28px 40px;
-        position: relative;
-        user-select: none;
-    }
-
-    .nav .menu-icon .navicon {
-        background: #333;
-        display: block;
-        height: 2px;
-        position: relative;
-        transition: background 0.2s ease-out;
-        width: 18px;
-    }
-
-    .nav .menu-icon .navicon:before,
-    .nav .menu-icon .navicon:after {
-        background: #333;
-        content: "";
-        display: block;
-        height: 100%;
-        position: absolute;
-        transition: all 0.2s ease-out;
-        width: 100%;
-    }
-
-    .nav .menu-icon .navicon:before {
-        top: 5px;
-    }
-
-    .nav .menu-icon .navicon:after {
-        top: -5px;
-    }
-
-    /* menu btn */
-
-    .nav .menu-btn {
-        display: none;
-    }
-
-    .nav .menu-btn:checked~.menu {
-        max-height: 240px;
-    }
-
-    .nav .menu-btn:checked~.menu-icon .navicon {
-        background: transparent;
-    }
-
-    .nav .menu-btn:checked~.menu-icon .navicon:before {
-        transform: rotate(-45deg);
-    }
-
-    .nav .menu-btn:checked~.menu-icon .navicon:after {
-        transform: rotate(45deg);
-    }
-
-    .nav .menu-btn:checked~.menu-icon:not(.steps) .navicon:before,
-    .nav .menu-btn:checked~.menu-icon:not(.steps) .navicon:after {
-        top: 0;
+    #bt_top_stream {
+        margin-right: 10px;
     }
 
 
-
-    /* 48em = 768px */
-    @media (min-width: 768px) {
-        .nav {
-            display: flex;
-            justify-content: center;
-        }
-
-        .nav li {
-            float: left;
-        }
-
-        .nav li a {
-            padding: 20px 30px;
-        }
-
-        .nav .menu {
-            clear: none;
-            max-height: none;
-        }
-
-        .nav .menu-icon {
-            display: none;
-        }
-
-
-
-    }
 
 
     /***************************   MOVIL    ****************************/
@@ -384,22 +145,34 @@ if (!empty($_SESSION['user'])) {
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
                     <?php
-                    $foto_avatar =  existe_Avatar($user);
 
-                    if ($foto_avatar == "") {
+                    if (isset($_SESSION['foto_avatar'])) {
 
                     ?>
 
-                        <img id="foto_user" src="../img/usuario.svg" alt="avatar">
+                        <img id="foto_user" src="<?php echo $_SESSION['foto_avatar']; ?>" alt="avatar">
 
-                    <?php
+                        <?php
 
                     } else {
-                    ?>
 
-                        <img id="foto_user" src="<?php echo "../Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
+                        $foto_avatar =  existe_Avatar($user);
+
+                        if ($foto_avatar == "") {
+
+                        ?>
+
+                            <img id="foto_user" src="../img/usuario.svg" alt="avatar">
+
+                        <?php
+
+                        } else {
+                        ?>
+
+                            <img id="foto_user" src="<?php echo "../Download/fotos_Avatar/" . $foto_avatar; ?>" alt="avatar">
 
                     <?php
+                        }
                     }
                     ?>
 
@@ -409,7 +182,7 @@ if (!empty($_SESSION['user'])) {
 
                 </div>
                 <div id="sub_cabecera_right_right">
-                    <a title="Cerrar Sesión" href="Controladores/cerrar_sesion.php" id="cerrar_sesion"><img src="../img/puerta_2.svg"></a>
+                    <a title="Cerrar Sesión" href="../Controladores/cerrar_sesion.php" id="cerrar_sesion"><img src="../img/puerta_2.svg"></a>
                 </div>
             </div>
         </div>
@@ -424,7 +197,7 @@ if (!empty($_SESSION['user'])) {
                     <a href="Foro.php">Foro</a>
                 </li>
                 <li>
-                    <a class="activa" href="clipsTV.php">Gamming TV</a>
+                    <a class="activa" href="clipsTV.php">Gaming TV</a>
                 </li>
                 <li>
                     <a href="#">Ranking</a>
@@ -491,6 +264,8 @@ if (!empty($_SESSION['user'])) {
             $("#foto_user").attr("title", "Iniciar Sesión");
             $("#cerrar_sesion").css("display", "none");
             console.log("none");
+        } else {
+            $("#foto_user").click(verPerfil);
         }
 
         function print_Game(game, i) {
@@ -801,9 +576,9 @@ if (!empty($_SESSION['user'])) {
                 $(this).children("iframe").attr("height", height);
                 $(this).children("iframe").attr("frameborder", "0");
                 $(this).children("iframe").attr("scrolling", "no");
-                $(this).children("iframe").attr("allowfullscreen", "true");
-                //$(this).children("iframe").attr("webkitallowfullscreen", "true");
-                //$(this).children("iframe").attr("mozallowfullscreen", "true");
+                $(this).children("iframe").attr("allowfullscreen", "");
+                $(this).children("iframe").attr("webkitallowfullscreen", "");
+                $(this).children("iframe").attr("mozallowfullscreen", "");
 
             });
 
@@ -821,6 +596,10 @@ if (!empty($_SESSION['user'])) {
 
     function iniciarSesion() {
         window.location = "./login.php";
+    }
+
+    function verPerfil() {
+        window.location = "Perfil.php";
     }
 </script>
 

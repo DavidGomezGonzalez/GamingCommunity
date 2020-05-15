@@ -7,6 +7,7 @@
  */
 session_start();
 unset($_SESSION['user']);
+unset($_SESSION['foto_avatar']);
 session_unset();
 session_destroy();
 
