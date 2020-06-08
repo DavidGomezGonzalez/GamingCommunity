@@ -9,12 +9,27 @@ and open the template in the editor.
 <head>
     <meta charset="UTF-8">
     <title></title>
+
+    <!-- Google Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Passion+One' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" <link rel="stylesheet" href="http://path/to/font-awesome/css/font-awesome.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href='//fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+
     <script src="../JavaScript/jQuery v3.4.1.js" type="text/javascript"></script>
     <script>
         $(document).ready(inicio);
 
         function inicio() {
             $("#b_registrarse").click(registrar);
+            $("#b_login").click(function() {
+                window.location = "login.php";
+            });
             $("#nick").blur(verificarNick);
             $("#email").blur(verificarEmail);
         }
@@ -147,16 +162,7 @@ and open the template in the editor.
                         }
                         if (myObj == "Creado Correctamentenull") {
 
-                            $("#correctamente").remove();
-
-                            var p = document.createElement('p');
-                            p.textContent = "Creado Correctamente.";
-                            p.setAttribute("id", "correctamente");
-
-
-                            var email = document.getElementById("email").parentElement;
-
-                            email.parentNode.insertBefore(p, email.nextSibling);
+                            $("#alerta").show();
 
                             $("input[type=text]").val("");
                             $("input[type=password]").val("");
@@ -172,7 +178,7 @@ and open the template in the editor.
         }
     </script>
     <style>
-        * {
+        /* * {
             margin: 0;
             padding: 0;
         }
@@ -216,10 +222,98 @@ and open the template in the editor.
             background-color: lightgreen;
             width: 300px;
             margin: auto;
+            margin-top: 20px;
             display: flex;
             justify-content: center;
             margin-bottom: 20px;
 
+
+        } */
+
+
+
+        /**************************** *****************************/
+
+        body,
+        html {
+            height: 100%;
+            background-repeat: no-repeat;
+            background-color: #d3d3d3;
+            font-family: 'Oxygen', sans-serif;
+            background: linear-gradient(to bottom, black, #800000, black);
+        }
+
+        .main {
+            margin-top: 70px;
+        }
+
+        h1.title {
+            font-size: 50px;
+            font-family: 'Passion One', cursive;
+            font-weight: 400;
+            color: white;
+        }
+
+        hr {
+            width: 10%;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            margin-bottom: 15px;
+        }
+
+        input,
+        input::-webkit-input-placeholder {
+            font-size: 11px;
+            padding-top: 3px;
+        }
+
+        .main-login {
+            background-color: #fff;
+            /* shadows and rounded borders */
+            -moz-border-radius: 2px;
+            -webkit-border-radius: 2px;
+            border-radius: 2px;
+            -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+            -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+
+        }
+
+        .main-center {
+            max-width: 330px;
+            margin-top: 30px;
+            margin: 0 auto;
+            padding: 40px 40px;
+
+        }
+
+        .login-button {
+            margin-top: 5px;
+        }
+
+        .login-register {
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background-color: #800000;
+            border-color: #800000;
+        }
+
+
+        @media (max-width: 1007px) {
+
+            .main-center {
+                max-width: 90%;
+            }
 
         }
     </style>
@@ -227,20 +321,80 @@ and open the template in the editor.
 
 <body>
 
-    <h1>Registrarse</h1>
+    <div class="container">
+        <div class="row main">
+            <div class="panel-heading">
+                <div class="panel-title text-center">
+                    <h1 class="title">Gaming Community</h1>
+                </div>
+            </div>
+            <div class="main-login main-center">
+                <form class="form-horizontal" method="post" action="#">
 
-    <p><span>Nickname: </span><input id="nick" type="text" name="nick"></p>
-    <p><span>Nombre: </span><input id="nombre" type="text" name="nombre"></p>
-    <p><span>Apellidos: </span><input id="apellidos" type="text" name="apellidos"></p>
-    <p><span>Contraseña: </span><input id="pass" type="password" name="pass"></p>
-    <p><span>Email: </span><input id="email" type="email" name="email"></p>
-    <p><input type="submit" id="b_registrarse" value="Registrarse"></p>
-    <form action="login.php" method="post">
-        <p><input type="submit" value="Iniciar Sesión"></p>
-    </form>
+                    <div class="form-group">
+                        <label for="nick" class="cols-sm-2 control-label">Nickname</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-users fa" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" id="nick" name="nick" placeholder="Introduce Nickname" />
+                            </div>
+                        </div>
+                    </div>
 
-    <?php
-    ?>
+                    <div class="form-group">
+                        <label for="email" class="cols-sm-2 control-label">Nombre</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Introduce Nombre" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username" class="cols-sm-2 control-label">Apellidos</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user fa" aria-hidden="true"></i></span>
+                                <input type="text" class="form-control" name="apellidos" id="apellidos" placeholder="Introduce Apellidos" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password" class="cols-sm-2 control-label">Contraseña</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span>
+                                <input type="password" class="form-control" name="pass" id="pass" placeholder="Introduce Contraseña" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm" class="cols-sm-2 control-label">Email</label>
+                        <div class="cols-sm-10">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
+                                <input type="email" class="form-control" name="email" id="email" placeholder="Introduce Email" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: none;" id="alerta" class="alert alert-success" role="alert">
+                        Creado Correctamente
+                    </div>
+
+                    <div class="form-group ">
+                        <button id="b_registrarse" type="button" class="btn btn-primary btn-lg btn-block login-button">Registrarse</button>
+                    </div>
+                    <div class="form-group ">
+                        <button style="background: black;" id="b_login" type="button" class="btn btn-primary btn-lg btn-block login-button">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>

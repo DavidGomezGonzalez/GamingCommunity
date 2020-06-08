@@ -99,6 +99,29 @@ function iniciarSesionEmail($email, $passwd)
     return $correcta;
 }
 
+function verRoot($nick)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT tipo FROM users WHERE nick = '$nick'");
+
+    $tipo = null;
+
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $tipo = $row["tipo"];
+        }
+    }
+
+    if ($tipo == 1) {
+        $tipo = "root";
+    }
+
+    unset($conexion);
+
+    return $tipo;
+}
+
 
 function verNick($email)
 {
@@ -188,9 +211,7 @@ function ultimoComentarioForo($id_tema)
         while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
             $nick = $row["nick_user"];
 
-            echo "<a href='#'>";
-            echo $nick;
-            echo "</a></p><p>";
+            echo "<a href='verForo.php?id=" . $id_tema . "&ultimo=yes'>" . $nick . "</a></p><p>";
 
             $fecha = $row['fecha_creacion'];
             $fecha = cambiarFecha($fecha);
@@ -204,9 +225,7 @@ function ultimoComentarioForo($id_tema)
         $resultado2 = $conexion2->query("SELECT * FROM tema WHERE id = " . $id_tema . "");
         if ($resultado2) {
             while ($row2 = $resultado2->fetch(PDO::FETCH_ASSOC)) {
-                echo "<a href='#'>";
-                echo $row2["autor_nick"];
-                echo "</a></p><p>";
+                echo "<a href='verForo.php?id=" . $id_tema . "&ultimo=yes'>" . $row2["autor_nick"] . "</a></p><p>";
                 echo $row2['fecha_creacion'];
             }
             unset($conexion2);
@@ -234,6 +253,24 @@ function existe_Avatar($nick)
     return $foto_Avatar;
 }
 
+function email_User_Nick($nick)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM users WHERE nick = '" . $nick . "'");
+
+    $email = "";
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $email = $row["email"];
+        }
+    }
+
+    unset($conexion);
+
+    return $email;
+}
+
 
 function insetarComentarioForo($contenido, $fecha, $nick, $id_tema)
 {
@@ -257,11 +294,11 @@ function insetarComentarioForo($contenido, $fecha, $nick, $id_tema)
     unset($conexion);
 }
 
-function insetarTemaForo($titulo, $contenido, $autor, $fecha)
+function insetarTemaForo($titulo, $contenido, $autor, $fecha, $plataformas)
 {
     $conexion = Conexion::conectar();
 
-    $insert = $conexion->prepare("INSERT INTO tema (titulo, contenido, fecha_creacion, abierto, autor_nick, vistas) VALUES (?,?,?,?,?,?)");
+    $insert = $conexion->prepare("INSERT INTO tema (titulo, contenido, fecha_creacion, abierto, autor_nick, vistas, plataforma) VALUES (?,?,?,?,?,?,?)");
 
     $abierto = TRUE;
     $vistas = 0;
@@ -272,6 +309,7 @@ function insetarTemaForo($titulo, $contenido, $autor, $fecha)
     $insert->bindParam(4, $abierto);
     $insert->bindParam(5, $autor);
     $insert->bindParam(6, $vistas);
+    $insert->bindParam(7, $plataformas);
     $todobien = $insert->execute();
 
     if ($todobien) {
@@ -281,6 +319,30 @@ function insetarTemaForo($titulo, $contenido, $autor, $fecha)
     }
 
     unset($insert);
+    unset($conexion);
+}
+
+function editarTemaForo($titulo, $contenido, $fecha, $id)
+{
+    $conexion = Conexion::conectar();
+    $conexion->beginTransaction();
+
+    $insert = $conexion->prepare("UPDATE tema SET titulo=?,  contenido=?, fecha_creacion=? WHERE id = ?");
+
+    $insert->bindParam(1, $titulo);
+    $insert->bindParam(2, $contenido);
+    $insert->bindParam(3, $fecha);
+    $insert->bindParam(4, $id);
+
+    $todobien = $insert->execute();
+
+    if ($todobien == TRUE) {
+        $conexion->commit();
+        echo "Modificado Correctamente";
+    } else {
+        $conexion->rollback();
+        echo "Error";
+    }
     unset($conexion);
 }
 
@@ -304,4 +366,412 @@ function verForo($id)
     unset($conexion);
 
     return $tema;
+}
+
+
+function votosUsuario($user)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT count(*) FROM votos WHERE user_valorado = '" . $user . "'")->fetchColumn();
+
+    unset($conexion);
+
+    return $resultado;
+}
+
+
+function verPuntuacionUser($nick)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM votos WHERE user_valorado = '" . $nick . "'");
+    $valoracion = 0;
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $valoracion += $row["valoracion"];
+        }
+    }
+
+    unset($conexion);
+
+    return $valoracion;
+}
+
+function verUserVotados()
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT DISTINCT user_valorado FROM votos");
+    $users = array();
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $user = array();
+            $user = $row["user_valorado"];
+            array_push($users, $user);
+        }
+    }
+
+    unset($conexion);
+
+    return $users;
+}
+
+
+function verGame($titulo, $plataforma)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM games WHERE titulo = '" . $titulo . "' AND plataforma ='" . $plataforma . "'");
+    $game = array();
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $game["id"] = $row["id"];
+            $game["titulo"] = $row["titulo"];
+            $game["descripcion"] = $row["descripcion"];
+            $game["plataformas_compatibles"] = $row["plataformas_compatibles"];
+            $game["plataforma"] = $row["plataforma"];
+            $game["img"] = $row["img"];
+            $game["developer"] = $row["developer"];
+            $game["fecha_publicacion"] = $row["fecha_publicacion"];
+        }
+    }
+
+    unset($conexion);
+
+    return $game;
+}
+
+
+function insetarGame($titulo, $descripcion, $plataformas, $plataforma, $img, $developer, $fecha, $genero)
+{
+    $conexion = Conexion::conectar();
+
+    $insert = $conexion->prepare("INSERT INTO games (titulo, descripcion, plataformas_compatibles, plataforma, img, developer, fecha_publicacion, genero) VALUES (?,?,?,?,?,?,?,?)");
+
+    $insert->bindParam(1, $titulo);
+    $insert->bindParam(2, $descripcion);
+    $insert->bindParam(3, $plataformas);
+    $insert->bindParam(4, $plataforma);
+    $insert->bindParam(5, $img);
+    $insert->bindParam(6, $developer);
+    $insert->bindParam(7, $fecha);
+    $insert->bindParam(8, $genero);
+    $todobien = $insert->execute();
+
+    if ($todobien) {
+        echo "Creado Correctamente";
+    } else {
+        //echo "Error";
+        print_r($insert->errorInfo());
+    }
+
+    unset($insert);
+    unset($conexion);
+}
+
+function verLikes_Dislikes($id)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM tema WHERE id = " . $id . "");
+    $tema = array();
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $tema["me_gustas"] = $row["me_gustas"];
+            $tema["no_me_gustas"] = $row["no_me_gustas"];
+        }
+    }
+
+    unset($conexion);
+
+    return $tema;
+}
+
+function Likes_DislikesInsertar($id, $likes, $dislikes)
+{
+
+    $conexion = Conexion::conectar();
+    $conexion->beginTransaction();
+
+    $insert = $conexion->prepare("UPDATE tema SET me_gustas=?,  no_me_gustas=? WHERE id = ?");
+
+    $insert->bindParam(1, $likes);
+    $insert->bindParam(2, $dislikes);
+    $insert->bindParam(3, $id);
+
+    $todobien = $insert->execute();
+
+    if ($todobien == TRUE) {
+        $conexion->commit();
+        echo "Modificado Correctamente";
+    } else {
+        $conexion->rollback();
+        echo "Error";
+    }
+
+    unset($conexion);
+}
+
+
+function insetar_Votos_LikeDislike($id_tema, $nick, $likes, $dislikes)
+{
+    $conexion = Conexion::conectar();
+
+    $insert = $conexion->prepare("INSERT INTO votos_likes (id_tema, nick_user, me_gusta, no_me_gusta) VALUES (?,?,?,?)");
+
+    $insert->bindParam(1, $id_tema);
+    $insert->bindParam(2, $nick);
+    $insert->bindParam(3, $likes);
+    $insert->bindParam(4, $dislikes);
+    $todobien = $insert->execute();
+
+    if ($todobien) {
+        echo "Creado Correctamente";
+    } else {
+        //echo "Error";
+        print_r($insert->errorInfo());
+    }
+
+    unset($insert);
+    unset($conexion);
+}
+
+
+function verLikes_Dislikes_Votos($id, $nick)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM votos_likes  WHERE id_tema = " . $id . " AND nick_user ='" . $nick . "'");
+    $tema = array();
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $tema["me_gusta"] = $row["me_gusta"];
+            $tema["no_me_gusta"] = $row["no_me_gusta"];
+        }
+    }
+
+    unset($conexion);
+
+    return $tema;
+}
+
+
+function update_Votos_Like($id_tema, $user, $likes, $dislikes)
+{
+
+    $conexion = Conexion::conectar();
+    $conexion->beginTransaction();
+
+    $insert = $conexion->prepare("UPDATE votos_likes  SET me_gusta=?, no_me_gusta=?  WHERE id_tema = ? AND nick_user = ?");
+
+    $insert->bindParam(1, $likes);
+    $insert->bindParam(2, $dislikes);
+    $insert->bindParam(3, $id_tema);
+    $insert->bindParam(4, $user);
+
+    $todobien = $insert->execute();
+
+
+    if ($todobien == TRUE) {
+        $conexion->commit();
+        echo "Modificado Correctamente";
+    } else {
+        $conexion->rollback();
+        echo "Error";
+    }
+
+    unset($conexion);
+}
+
+
+function verforosRankingLikes()
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM tema ORDER BY me_gustas DESC");
+    $temas = array();
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $tema = array();
+            $tema["id"] = $row["id"];
+            $tema["titulo"] = $row["titulo"];
+            $tema["contenido"] = $row["contenido"];
+            $tema["fecha_creacion"] = $row["fecha_creacion"];
+            $tema["abierto"] = $row["abierto"];
+            $tema["autor_nick"] = $row["autor_nick"];
+            $tema["vistas"] = $row["vistas"];
+            $tema["me_gustas"] = $row["me_gustas"];
+            $tema["no_me_gustas"] = $row["no_me_gustas"];
+            array_push($temas, $tema);
+        }
+    }
+
+    unset($conexion);
+
+    return $temas;
+}
+
+function verforosRankingDisLikes()
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM tema ORDER BY no_me_gustas DESC");
+    $temas = array();
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $tema = array();
+            $tema["id"] = $row["id"];
+            $tema["titulo"] = $row["titulo"];
+            $tema["contenido"] = $row["contenido"];
+            $tema["fecha_creacion"] = $row["fecha_creacion"];
+            $tema["abierto"] = $row["abierto"];
+            $tema["autor_nick"] = $row["autor_nick"];
+            $tema["vistas"] = $row["vistas"];
+            $tema["me_gustas"] = $row["me_gustas"];
+            $tema["no_me_gustas"] = $row["no_me_gustas"];
+            array_push($temas, $tema);
+        }
+    }
+
+    unset($conexion);
+
+    return $temas;
+}
+
+function verforosRankingVisitas()
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM tema ORDER BY vistas DESC");
+    $temas = array();
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $tema = array();
+            $tema["id"] = $row["id"];
+            $tema["titulo"] = $row["titulo"];
+            $tema["contenido"] = $row["contenido"];
+            $tema["fecha_creacion"] = $row["fecha_creacion"];
+            $tema["abierto"] = $row["abierto"];
+            $tema["autor_nick"] = $row["autor_nick"];
+            $tema["vistas"] = $row["vistas"];
+            $tema["me_gustas"] = $row["me_gustas"];
+            $tema["no_me_gustas"] = $row["no_me_gustas"];
+            array_push($temas, $tema);
+        }
+    }
+
+    unset($conexion);
+
+    return $temas;
+}
+
+function verId_tema_UltComentarios()
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT DISTINCT id_tema FROM comentarios ORDER BY fecha_creacion DESC");
+    $temas = array();
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $tema = array();
+            $tema["id_tema"] = $row["id_tema"];
+            array_push($temas, $tema);
+        }
+    }
+
+    unset($conexion);
+
+    return $temas;
+}
+
+
+function verNoticiasBuscador($noticia)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM noticias WHERE lower(titulo) LIKE " . "'" . $noticia . "%'" . " OR lower(titulo) LIKE " . "'%" . $noticia . "%'");
+    $noticias = array();
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $noticia = array();
+            $noticia["id"] = $row["id"];
+            $noticia["titulo"] = $row["titulo"];
+            $noticia["subtitulo"] = $row["subtitulo"];
+            $noticia["contenido"] = $row["contenido"];
+            $noticia["img"] = $row["img"];
+            $noticia["fecha_creacion"] = $row["fecha_creacion"];
+            array_push($noticias, $noticia);
+        }
+    }
+
+    unset($conexion);
+
+    return $noticias;
+}
+
+
+
+function verPlataformasBD()
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM plataformas");
+    $plataformas = array();
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $plataforma = array();
+            $plataforma["titulo"] = $row["titulo"];
+            $plataforma["value"] = $row["value"];
+            array_push($plataformas, $plataforma);
+        }
+    }
+
+    unset($conexion);
+    return $plataformas;
+}
+
+function verTituloPlataformas($value)
+{
+    $conexion = Conexion::conectar();
+    $resultado = $conexion->query("SELECT * FROM plataformas WHERE value ='" . $value . "'");
+
+    if ($resultado) {
+        while ($row = $resultado->fetch(PDO::FETCH_ASSOC)) {
+            $titulo = $row["titulo"];
+        }
+    }
+
+    unset($conexion);
+    return $titulo;
+}
+
+function insertarCarrito($game, $plataforma, $precio, $img)
+{
+    session_start();
+
+    $repetido = FALSE;
+
+    if (empty($_SESSION['carrito'])) {
+        $_SESSION['carrito'] = array();
+    } else {
+
+        for ($i = 0; $i < count($_SESSION['carrito']); $i++) {
+
+            if ($_SESSION['carrito'][$i]['game'] == $game && $_SESSION['carrito'][$i]['plataforma'] == $plataforma) {
+                $repetido = TRUE;
+            }
+        }
+    }
+
+    $array = [
+        "game" => $game,
+        "plataforma" => $plataforma,
+        "precio" => $precio,
+        "img" => $img
+    ];
+
+    if ($repetido == FALSE) {
+        array_push($_SESSION['carrito'], $array);
+        $res = "Insertado ha Carrito";
+    } else {
+        $res = "Repetido";
+    }
+
+
+    return $res;
 }

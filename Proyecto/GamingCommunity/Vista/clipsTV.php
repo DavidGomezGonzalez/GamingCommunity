@@ -13,7 +13,7 @@ and open the template in the editor.
 <script src="../JavaScript/jQuery v3.4.1.js" type="text/javascript"></script>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" <link rel="stylesheet" href="http://path/to/font-awesome/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <link rel="stylesheet" href="../css/menu.css">
 
 
@@ -31,13 +31,18 @@ if (!empty($_SESSION['user'])) {
     /*************** ClipsTV *******************/
 
 
+    #contenido {
+        background: linear-gradient(to bottom, black, #800000, black);
+    }
+
+
     #contenido_stream {
         margin-top: 20px;
         display: flex;
         direction: row;
         flex-wrap: nowrap;
         overflow-x: auto;
-        border: 2px solid black;
+        border: 4px solid #800000;
         visibility: hidden;
         border-radius: 50px;
         background-color: white;
@@ -94,6 +99,10 @@ if (!empty($_SESSION['user'])) {
         color: red;
     }
 
+    .miniatura_img {
+        cursor: pointer;
+    }
+
 
     #div_button {
         display: flex;
@@ -105,6 +114,10 @@ if (!empty($_SESSION['user'])) {
         display: flex;
         flex-direction: row;
         align-items: center;
+    }
+
+    #div_button div label {
+        color: white;
     }
 
     #bt_top_stream {
@@ -137,7 +150,7 @@ if (!empty($_SESSION['user'])) {
 
     <div id="contenedor">
         <div id="cabecera">
-            <div id="logo"></div>
+            <img id="img_logo" src="../img/logo.svg">
             <div id="sub_cabecera">
                 <input type="search">
                 <button>🔍</button>
@@ -145,27 +158,22 @@ if (!empty($_SESSION['user'])) {
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
                     <?php
-
                     if (isset($_SESSION['foto_avatar'])) {
-
                     ?>
 
                         <img id="foto_user" src="<?php echo $_SESSION['foto_avatar']; ?>" alt="avatar">
 
                         <?php
-
                     } else {
 
-                        $foto_avatar =  existe_Avatar($user);
+                        $foto_avatar = existe_Avatar($user);
 
                         if ($foto_avatar == "") {
-
                         ?>
 
                             <img id="foto_user" src="../img/usuario.svg" alt="avatar">
 
                         <?php
-
                         } else {
                         ?>
 
@@ -200,10 +208,13 @@ if (!empty($_SESSION['user'])) {
                     <a class="activa" href="clipsTV.php">Gaming TV</a>
                 </li>
                 <li>
-                    <a href="#">Ranking</a>
+                    <a href="Ranking.php">Ranking</a>
                 </li>
                 <li>
                     <a href="videojuegos.php">Video Juegos</a>
+                </li>
+                <li>
+                    <a href="Kedadas.php">Quedadas</a>
                 </li>
             </ul>
         </nav>
@@ -247,12 +258,93 @@ if (!empty($_SESSION['user'])) {
 
 
     </div>
+    <footer>
+        <img src="../img/logo.svg">
+        <p><b>&copy; David Gómez </b> - Diseñador Web</p>
+        <p><a href="PoliticaPrivacidad.php">POLÍTICA DE PRIVACIDAD</a> &bull; <a href="AvisoLegal.php"> AVISO LEGAL</a> &bull; <a href="Contacto.php"> CONTACTO</a></p>
+    </footer>
 </body>
 
 <script>
     $(document).ready(inicio);
 
+    function buscar() {
 
+        var noticia = $("input[type=search]").val();
+
+        console.log(noticia);
+
+        if (noticia) {
+
+            t0 = performance.now();
+
+            var objeto = {
+                "noticia": noticia
+            };
+
+            var parametros = JSON.stringify(objeto);
+            console.log(parametros);
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                console.log(this.readyState + " " + this.status);
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = JSON.parse(this.responseText);
+                    console.log(myObj);
+
+                    $("#contenido").empty();
+                    $("#contenido").css("background-image", "none");
+                    $("#contenido").css("background-color", "white");
+                    $("#contenido").css("display", "block");
+                    $("#contenido").append("<p class='p_res'></p>");
+
+                    t1 = performance.now();
+                    console.log("La llamada a hacerAlgo tardó " + (t1 - t0) + " milisegundos.");
+
+                    $("#contenido p").text("Aproximadamente " + myObj.length + " resultados (0," + Math.trunc(t1 - t0) + " segundos)");
+
+
+
+                    if (myObj.length != 0) {
+
+                        for (var i = 0; i < myObj.length; i++) {
+                            var titulo = (myObj[i].titulo).toUpperCase();
+
+                            noticia = noticia.toUpperCase();
+
+                            var str_2 = "<b>" + noticia + "</b>";
+
+                            titulo = titulo.replace(noticia, str_2);
+
+                            $("#contenido").append("<div class='div_resultado'></div>");
+                            $("#contenido .div_resultado").eq(i).attr("id", myObj[i].id);
+                            $("#contenido .div_resultado").eq(i).append("<h1>" + titulo + "</h1>");
+                            $("#contenido .div_resultado").eq(i).append("<h2>" + myObj[i].subtitulo + "</h2>");
+                            $("#contenido .div_resultado").eq(i).append("<h3>" + myObj[i].fecha_creacion + "</h3>");
+                        }
+
+                    }
+
+                    $(".div_resultado").click(function() {
+
+                        //console.log(this);
+
+                        var id = $(this).attr('id');
+
+                        console.log(id);
+
+                        window.location = "verNoticia.php?id=" + id;
+
+                    });
+
+                }
+            };
+
+            xhr.open("POST", "../Controladores/controller.php", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("accion=buscarNoticia&objeto=" + parametros);
+        }
+    }
 
 
     function inicio() {
@@ -267,6 +359,13 @@ if (!empty($_SESSION['user'])) {
         } else {
             $("#foto_user").click(verPerfil);
         }
+
+        $("#sub_cabecera button").click(buscar);
+        $("#sub_cabecera input[type=search]").on('keypress', function(e) {
+            if (e.which == 13) {
+                $("#sub_cabecera button").click();
+            }
+        });
 
         function print_Game(game, i) {
             $(".div_stream2 h3").eq(i).append("<a>");
@@ -565,7 +664,7 @@ if (!empty($_SESSION['user'])) {
                 $(this).children("img").css("display", "none");
 
 
-                var enlace = "https://player.twitch.tv/?channel=" + canal + "&parent=streamernews.example.com";
+                var enlace = "https://player.twitch.tv/?channel=" + canal /* + "&parent=streamernews.example.com"*/ ;
 
 
                 //console.log(height);
@@ -579,6 +678,7 @@ if (!empty($_SESSION['user'])) {
                 $(this).children("iframe").attr("allowfullscreen", "");
                 $(this).children("iframe").attr("webkitallowfullscreen", "");
                 $(this).children("iframe").attr("mozallowfullscreen", "");
+                $(this).children("iframe").attr("allow", "autoplay; fullscreen");
 
             });
 

@@ -195,7 +195,7 @@ body {
 }
 
 .nav .menu-btn:checked~.menu {
-    max-height: 240px;
+    max-height: 460px;
 }
 
 .nav .menu-btn:checked~.menu-icon .navicon {
@@ -216,9 +216,45 @@ body {
 }
 
 
-/* 48em = 768px */
+/********************  Buscador  *******************/
 
-@media (min-width: 768px) {
+.div_resultado {
+    padding: 2%;
+    margin-bottom: 20px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.p_res {
+    margin-bottom: 20px;
+}
+
+.div_resultado:hover {
+    opacity: 0.8;
+}
+
+.div_resultado h1 {
+    color: blue;
+}
+
+.div_resultado h3 {
+    color: green;
+    background-color: white;
+    border: none;
+    text-align: left;
+}
+
+.div_resultado h2 {
+    text-align: left;
+    padding: 0;
+    font-weight: normal;
+}
+
+.div_resultado b {
+    color: #800000;
+}
+
+@media (min-width: 844px) {
     .nav {
         display: flex;
         justify-content: center;
@@ -234,6 +270,49 @@ body {
         max-height: none;
     }
     .nav .menu-icon {
+        display: none;
+    }
+}
+
+footer p {
+    margin-bottom: 20px;
+}
+
+footer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0 5%;
+    align-items: center;
+    color: white;
+    height: 230px;
+    padding-bottom: 5%;
+}
+
+footer img {
+    width: 50%;
+}
+
+footer a {
+    text-decoration: none;
+    color: white;
+}
+
+footer a:hover {
+    text-decoration: none;
+}
+
+@media (max-width: 1085px) {
+    #img_logo {
+        width: 500px;
+    }
+    footer img {
+        width: 500px;
+    }
+}
+
+@media (max-width: 860px) {
+    #sub_cabecera {
         display: none;
     }
 }

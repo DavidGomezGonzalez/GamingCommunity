@@ -11,3 +11,17 @@ Client ID
 123000252162-456e0cvqn107jm1j758ds0dkmp9jk8j6.apps.googleusercontent.com
 Client Secret
 o7X6EQyJ7bXLBLbufKGcbRdo
+
+
+
+Client ID
+123000252162-456e0cvqn107jm1j758ds0dkmp9jk8j6.apps.googleusercontent.com
+Client Secret
+o7X6EQyJ7bXLBLbufKGcbRdo
+
+
+Client ID
+123000252162-51g73aslefrevboq56m53t8kl7u1sl94.apps.googleusercontent.com
+Client Secret
+w19ExqIgSO3Fm_6hU-E6itq7
+info

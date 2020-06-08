@@ -24,10 +24,13 @@ require_once 'Controladores/FuncionesNoticias.php';
 if (!empty($_SESSION['user'])) {
     $user = $_SESSION['user'];
 }
-
 ?>
 
 <style>
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+
     .nav {
         margin: 0 !important;
     }
@@ -166,6 +169,10 @@ if (!empty($_SESSION['user'])) {
         grid-template-rows: 100%;
     }
 
+    .noticia-p {
+        text-align: justify;
+    }
+
 
     .contenido-noticia {
         display: grid;
@@ -174,11 +181,11 @@ if (!empty($_SESSION['user'])) {
         grid-template-columns: 1fr;
         /* 40% fondo 60% noticia*/
         grid-template-rows: 40% 60%;
-        outline: 3px solid #c32231;
+        outline: 3px solid black;
         background-color: white;
     }
 
-    .contenido-noticia:hover{
+    .contenido-noticia:hover {
         cursor: pointer;
     }
 
@@ -225,9 +232,13 @@ if (!empty($_SESSION['user'])) {
             "noticia5 noticia6";
         text-align: justify;
         padding-top: 5%;
-        background-image: url(img/seamless-pattern-of-abstract-black-hexagon-background-with-red-line-vector.jpg);
-
+        /*background-image: url(img/seamless-pattern-of-abstract-black-hexagon-background-with-red-line-vector.jpg);*/
+        background: linear-gradient(to bottom, black, #800000, black);
     }
+
+
+
+
 
     @media (max-width: 1007px) {
 
@@ -270,6 +281,16 @@ if (!empty($_SESSION['user'])) {
             /*Tamaño desde Móvil*/
         }
 
+        figure.slider figure figcaption {
+            position: static;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff;
+            width: 100%;
+            font-size: 1.5rem;
+            padding: .6rem;
+        }
+
     }
 </style>
 
@@ -277,7 +298,7 @@ if (!empty($_SESSION['user'])) {
 
     <div id="contenedor">
         <div id="cabecera">
-            <div id="logo"></div>
+            <img id="img_logo" src="img/logo.svg">
             <div id="sub_cabecera">
                 <input type="search">
                 <button>🔍</button>
@@ -285,27 +306,22 @@ if (!empty($_SESSION['user'])) {
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
                     <?php
-
                     if (isset($_SESSION['foto_avatar'])) {
-
                     ?>
 
                         <img id="foto_user" src="<?php echo $_SESSION['foto_avatar']; ?>" alt="avatar">
 
                         <?php
-
                     } else {
 
-                        $foto_avatar =  existe_Avatar($user);
+                        $foto_avatar = existe_Avatar($user);
 
                         if ($foto_avatar == "") {
-
                         ?>
 
                             <img id="foto_user" src="img/usuario.svg" alt="avatar">
 
                         <?php
-
                         } else {
                         ?>
 
@@ -341,10 +357,13 @@ if (!empty($_SESSION['user'])) {
                     <a href="Vista/clipsTV.php">Gaming TV</a>
                 </li>
                 <li>
-                    <a href="#">Ranking</a>
+                    <a href="Vista/Ranking.php">Ranking</a>
                 </li>
                 <li>
                     <a href="Vista/videojuegos.php">Video Juegos</a>
+                </li>
+                <li>
+                    <a href="Vista/Kedadas.php">Quedadas</a>
                 </li>
             </ul>
         </nav>
@@ -358,10 +377,17 @@ if (!empty($_SESSION['user'])) {
         <div id="contenido">
 
         </div>
+        <footer>
+            <img src="img/logo.svg">
+            <p><b>&copy; David Gómez </b> - Diseñador Web</p>
+            <p><a href="Vista/PoliticaPrivacidad.php">POLÍTICA DE PRIVACIDAD</a> &bull; <a href="Vista/AvisoLegal.php"> AVISO LEGAL</a> &bull; <a href="Vista/Contacto.php"> CONTACTO</a></p>
+        </footer>
 </body>
 </div>
 
 <script>
+    var t1 = null;
+    var t0 = null;
     $(document).ready(inicio);
 
     function ver_noticia() {
@@ -403,10 +429,7 @@ if (!empty($_SESSION['user'])) {
 
                     $(".slider a figure").eq(i).append("<figcaption>");
                     $(".slider a figure figcaption").eq(i).text(data[i].titulo);
-
                 }
-
-
 
             })
             .fail(function(jqXHR, textStatus, errorThrown) {
@@ -456,6 +479,86 @@ if (!empty($_SESSION['user'])) {
             });
     }
 
+    function buscar() {
+
+        var noticia = $("input[type=search]").val();
+
+        console.log(noticia);
+
+        if (noticia) {
+
+            t0 = performance.now();
+
+            var objeto = {
+                "noticia": noticia
+            };
+
+            var parametros = JSON.stringify(objeto);
+            console.log(parametros);
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                console.log(this.readyState + " " + this.status);
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = JSON.parse(this.responseText);
+                    console.log(myObj);
+
+                    $("#contenido").empty();
+                    $("#contenido").css("background-image", "none");
+                    $("#contenido").css("background-color", "white");
+                    $("#contenido").css("display", "block");
+                    $("#contenido").append("<p class='p_res'></p>");
+
+                    t1 = performance.now();
+                    console.log("La llamada a hacerAlgo tardó " + (t1 - t0) + " milisegundos.");
+
+                    $("#contenido p").text("Aproximadamente " + myObj.length + " resultados (0," + Math.trunc(t1 - t0) + " segundos)");
+
+
+
+                    if (myObj.length != 0) {
+
+                        for (var i = 0; i < myObj.length; i++) {
+                            var titulo = (myObj[i].titulo).toUpperCase();
+
+                            noticia = noticia.toUpperCase();
+
+                            var str_2 = "<b>" + noticia + "</b>";
+
+                            titulo = titulo.replace(noticia, str_2);
+
+                            $("#contenido").append("<div class='div_resultado'></div>");
+                            $("#contenido .div_resultado").eq(i).attr("id", myObj[i].id);
+                            $("#contenido .div_resultado").eq(i).append("<h1>" + titulo + "</h1>");
+                            $("#contenido .div_resultado").eq(i).append("<h2>" + myObj[i].subtitulo + "</h2>");
+                            $("#contenido .div_resultado").eq(i).append("<h3>" + myObj[i].fecha_creacion + "</h3>");
+                        }
+
+                    }
+
+                    $(".div_resultado").click(function() {
+
+                        //console.log(this);
+
+                        var id = $(this).attr('id');
+
+                        console.log(id);
+
+                        window.location = "./Vista/verNoticia.php?id=" + id;
+
+                    });
+
+
+
+                }
+            };
+
+            xhr.open("POST", "Controladores/controller.php", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("accion=buscarNoticia&objeto=" + parametros);
+        }
+    }
+
     function inicio() {
         var user = $("#user").text();
         console.log(user);
@@ -470,6 +573,28 @@ if (!empty($_SESSION['user'])) {
 
         carrusel();
         noticias();
+
+        // $("input[type=search]").blur(buscar);
+
+        $("#sub_cabecera button").click(buscar);
+        $("#sub_cabecera input[type=search]").on('keypress', function(e) {
+            if (e.which == 13) {
+                $("#sub_cabecera button").click();
+            }
+        });
+
+        $(".div_resultado").click(function() {
+
+            //console.log(this);
+
+            var id = $(this).attr('id');
+
+            console.log(id);
+
+            window.location = "./Vista/verNoticia.php?id=" + id;
+
+        });
+
 
 
 

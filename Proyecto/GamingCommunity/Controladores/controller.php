@@ -22,9 +22,6 @@ if ($_REQUEST["objeto"]) {
 }
 
 
-
-
-
 switch ($accion) {
     case "registarse":
         $respuesta = Registrarse($obj->nick, $obj->nombre, $obj->apellidos, $obj->pass, $obj->email);
@@ -50,6 +47,14 @@ switch ($accion) {
             $_SESSION['user'] = verNick($obj->email);
         }
 
+        if ($respuesta == TRUE) {
+            $resp = verRoot($_SESSION['user']);
+
+            if ($resp == "root") {
+                $respuesta = "root";
+            }
+        }
+
         echo json_encode($respuesta);
         break;
     case "iniciarSesionGoogle":
@@ -60,14 +65,61 @@ switch ($accion) {
         echo json_encode("Logged");
         break;
     case "guardarComentarioForo":
-        $respuesta = insetarComentarioForo($obj->contenido, $obj->fecha, $obj->user, $obj->id_tema);
+        $respuesta = insetarComentarioForo($obj->contenido, $obj->fecha, $obj->user, $obj->id_tema, $obj->id_tema);
         echo json_encode($respuesta);
         break;
     case "guardarTemaForo":
-        $respuesta = insetarTemaForo($obj->titulo, $obj->contenido, $obj->user, $obj->fecha);
+        $respuesta = insetarTemaForo($obj->titulo, $obj->contenido, $obj->user, $obj->fecha, $obj->plataforma);
         echo json_encode($respuesta);
         break;
+    case "editarTemaForo":
+        $respuesta = editarTemaForo($obj->titulo, $obj->contenido, $obj->fecha, $obj->id);
+        echo json_encode($respuesta);
+        break;
+    case "verGame":
+        $respuesta = verGame($obj->titulo, $obj->plataforma);
+        echo json_encode($respuesta);
+        break;
+    case "insertarGame":
+        $respuesta = insetarGame($obj->titulo, $obj->descripcion, $obj->plataformas, $obj->plataforma, $obj->img, $obj->developer, $obj->fecha, $obj->genero);
+        echo json_encode($respuesta);
+        break;
+    case "verLikes_Dislikes":
+        $respuesta = verLikes_Dislikes($obj->id);
+        echo json_encode($respuesta);
+        break;
+    case "insertarLikes":
+        $respuesta = Likes_DislikesInsertar($obj->id, $obj->likes, $obj->dislikes);
+        echo json_encode($respuesta);
+        break;
+    case "verLikes_Dislikes_votos":
+        $respuesta = verLikes_Dislikes_Votos($obj->id, $obj->user);
+        echo json_encode($respuesta);
+        break;
+    case "buscarNoticia":
+        $respuesta = verNoticiasBuscador($obj->noticia);
+        echo json_encode($respuesta);
+        break;
+    case "verEmail":
+        $respuesta = email_User_Nick($obj->nick_user);
+        echo json_encode($respuesta);
+        break;
+    case "insertarCarrito":
+        $respuesta = insertarCarrito($obj->game, $obj->plataforma, $obj->precio, $obj->img);
+        echo json_encode($respuesta);
+        break;
+    case "insertarLikesVotos":
+        $array = verLikes_Dislikes_Votos($obj->id, $obj->user);
 
+        if (count($array) == 0) {
+            $respuesta = insetar_Votos_LikeDislike($obj->id, $obj->user, $obj->likes, $obj->dislikes);
+            echo json_encode($respuesta);
+        } else {
+            $respuesta = update_Votos_Like($obj->id, $obj->user, $obj->likes, $obj->dislikes);
+            echo json_encode($respuesta);
+        }
+
+        break;
     default:
         break;
 }

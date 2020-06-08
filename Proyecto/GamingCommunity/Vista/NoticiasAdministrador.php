@@ -13,7 +13,7 @@ and open the template in the editor.
 <script src="../JavaScript/jQuery v3.4.1.js" type="text/javascript"></script>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" <link rel="stylesheet" href="http://path/to/font-awesome/css/font-awesome.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 <script src="https://cdn.ckeditor.com/4.14.0/standard/ckeditor.js"></script>
 
 <link rel="stylesheet" href="../css/menu.css">
@@ -29,13 +29,23 @@ if (!empty($_SESSION['user'])) {
     $user = $_SESSION['user'];
 }
 
+$root = verRoot($user);
 
+if ($root != "root") {
+    header("Location:../index.php");
+}
 
 ?>
 
 <style>
-    body {
+    #contenido {
+        padding: 2% 5%;
+        background: linear-gradient(to bottom, black, #800000, black);
+    }
+
+    #div_fondo {
         background-color: white;
+        padding: 4% 5%;
     }
 
     #logo {
@@ -47,7 +57,7 @@ if (!empty($_SESSION['user'])) {
         color: #30b0e5;
     }
 
-    #bt_Guardar_Noticia{
+    #bt_Guardar_Noticia {
         margin-top: 20px;
     }
 
@@ -75,7 +85,7 @@ if (!empty($_SESSION['user'])) {
 
     <div id="contenedor">
         <div id="cabecera">
-            <div id="logo"></div>
+            <img id="img_logo" src="../img/logo_Administration.svg">
             <div id="sub_cabecera">
                 <input type="search">
                 <button>🔍</button>
@@ -83,27 +93,22 @@ if (!empty($_SESSION['user'])) {
             <div id="sub_cabecera_right">
                 <div id="sub_cabecera_right_left">
                     <?php
-
                     if (isset($_SESSION['foto_avatar'])) {
-
                     ?>
 
                         <img id="foto_user" src="<?php echo $_SESSION['foto_avatar']; ?>" alt="avatar">
 
                         <?php
-
                     } else {
 
-                        $foto_avatar =  existe_Avatar($user);
+                        $foto_avatar = existe_Avatar($user);
 
                         if ($foto_avatar == "") {
-
                         ?>
 
                             <img id="foto_user" src="../img/usuario.svg" alt="avatar">
 
                         <?php
-
                         } else {
                         ?>
 
@@ -125,49 +130,145 @@ if (!empty($_SESSION['user'])) {
             </div>
         </div>
 
+        <nav class="nav">
+            <input class="menu-btn" type="checkbox" id="menu-btn" />
+            <label class="menu-icon" for="menu-btn"><span class="navicon"></span></label>
+            <ul class="menu">
+                <li>
+                    <a class="activa" href="NoticiasAdministrador.php">Noticias</a>
+                </li>
+                <li>
+                    <a href="KedadasAdministrador.php">Kedadas</a>
+                </li>
+            </ul>
+        </nav>
+
         <div id="contenido">
+            <div id="div_fondo">
 
-            <h1>Administración Noticias</h1>
 
-            <div id="div_adm">
+                <h1>Administración Noticias</h1>
 
-                <div class="form-group">
-                    <label for="exampleInputTitulo">Titulo</label>
-                    <input type="email" class="form-control" id="titulo" aria-describedby="emailHelp">
+                <div id="div_adm">
+
+                    <div class="form-group">
+                        <label for="exampleInputTitulo">Titulo</label>
+                        <input type="email" class="form-control" id="titulo" aria-describedby="emailHelp">
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputSubtitulo">Subtitulo</label>
+                        <input type="email" class="form-control" id="subtitulo" aria-describedby="emailHelp">
+                    </div>
+                    <form action="#" method="post" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="exampleFormControlFile">Imagen Portada</label>
+                            <input type="file" class="form-control-file" name="txtFile" id="txtFile">
+                        </div>
+
+                        <textarea name="editor1"></textarea>
+                        <script>
+                            CKEDITOR.replace('editor1');
+                        </script>
+
                 </div>
-                <div class="form-group">
-                    <label for="exampleInputSubtitulo">Subtitulo</label>
-                    <input type="email" class="form-control" id="subtitulo" aria-describedby="emailHelp">
-                </div>
-                <form action="#" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="exampleFormControlFile">Imagen Portada</label>
-                    <input type="file" class="form-control-file" name="txtFile" id="txtFile">
-                </div>
 
-                    <textarea name="editor1"></textarea>
-                    <script>
-                        CKEDITOR.replace('editor1');
-                    </script>
+                <button name="btnSubmit" type="button" id="bt_Guardar_Noticia" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Guardar</button>
+                </form>
+
+                <?php ?>
+
 
             </div>
-
-            <button name="btnSubmit" type="button" id="bt_Guardar_Noticia" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Guardar</button>
-            </form>
-
-            <?php
-
-
-            ?>
-
-
         </div>
 
     </div>
+    <footer>
+        <img src="../img/logo_Administration.svg">
+        <p><b>&copy; David Gómez </b> - Diseñador Web</p>
+        <p><a href="PoliticaPrivacidad.php">POLÍTICA DE PRIVACIDAD</a> &bull; <a href="AvisoLegal.php"> AVISO LEGAL</a> &bull; <a href="Contacto.php"> CONTACTO</a></p>
+    </footer>
 </body>
 
 <script>
     $(document).ready(inicio);
+
+    function buscar() {
+
+        var noticia = $("input[type=search]").val();
+
+        console.log(noticia);
+
+        if (noticia) {
+
+            t0 = performance.now();
+
+            var objeto = {
+                "noticia": noticia
+            };
+
+            var parametros = JSON.stringify(objeto);
+            console.log(parametros);
+
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                console.log(this.readyState + " " + this.status);
+                if (this.readyState == 4 && this.status == 200) {
+                    var myObj = JSON.parse(this.responseText);
+                    console.log(myObj);
+
+                    $("#contenido").empty();
+                    $("#contenido").css("background-image", "none");
+                    $("#contenido").css("background-color", "white");
+                    $("#contenido").css("display", "block");
+                    $("#contenido").append("<p class='p_res'></p>");
+
+                    t1 = performance.now();
+                    console.log("La llamada a hacerAlgo tardó " + (t1 - t0) + " milisegundos.");
+
+                    $("#contenido p").text("Aproximadamente " + myObj.length + " resultados (0," + Math.trunc(t1 - t0) + " segundos)");
+
+
+
+                    if (myObj.length != 0) {
+
+                        for (var i = 0; i < myObj.length; i++) {
+                            var titulo = (myObj[i].titulo).toUpperCase();
+
+                            noticia = noticia.toUpperCase();
+
+                            var str_2 = "<b>" + noticia + "</b>";
+
+                            titulo = titulo.replace(noticia, str_2);
+
+                            $("#contenido").append("<div class='div_resultado'></div>");
+                            $("#contenido .div_resultado").eq(i).attr("id", myObj[i].id);
+                            $("#contenido .div_resultado").eq(i).append("<h1>" + titulo + "</h1>");
+                            $("#contenido .div_resultado").eq(i).append("<h2>" + myObj[i].subtitulo + "</h2>");
+                            $("#contenido .div_resultado").eq(i).append("<h3>" + myObj[i].fecha_creacion + "</h3>");
+                        }
+
+                    }
+
+                    $(".div_resultado").click(function() {
+
+                        //console.log(this);
+
+                        var id = $(this).attr('id');
+
+                        console.log(id);
+
+                        window.location = "verNoticia.php?id=" + id;
+
+                    });
+
+                }
+            };
+
+            xhr.open("POST", "../Controladores/controller.php", true);
+            xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhr.send("accion=buscarNoticia&objeto=" + parametros);
+        }
+    }
 
     function subirarchivo() {
         var formData = new FormData();
@@ -198,9 +299,16 @@ if (!empty($_SESSION['user'])) {
             $("#foto_user").attr("title", "Iniciar Sesión");
             $("#cerrar_sesion").css("display", "none");
             console.log("none");
-        }else {
+        } else {
             $("#foto_user").click(verPerfil);
         }
+
+        $("#sub_cabecera button").click(buscar);
+        $("#sub_cabecera input[type=search]").on('keypress', function(e) {
+            if (e.which == 13) {
+                $("#sub_cabecera button").click();
+            }
+        });
 
         $("#bt_Guardar_Noticia").click(function() {
             var data = CKEDITOR.instances.editor1.getData();
